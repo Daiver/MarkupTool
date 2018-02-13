@@ -55,7 +55,7 @@ void MarkupView::updatePart()
 
 
 
-void MarkupView::updateBlocks(Body newBody)
+void MarkupView::updateBody(Body newBody)
 {
     clearScene();
     body = new Body();
@@ -247,7 +247,7 @@ void MarkupView::mousePressEvent(QMouseEvent *event)
         return;
 
     QPointF position = mapToScene(event->pos());
-    Landmark *landmark = new Landmark(position.x()-0, position.y()-0, 0.5, 0.5, 0);
+    Landmark *landmark = new Landmark(position.x(), position.y(), 0.5, 0.5, 0);
     connect(landmark, SIGNAL(changePosition(QPointF)), this, SLOT(updatePart()));
     addPointInPart(landmark);
     scene->addItem(landmark);

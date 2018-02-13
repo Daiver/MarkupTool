@@ -17,7 +17,7 @@ public:
 
     void drawImage(const QImage &image);
     void updateBodyPart();
-    void updateBlocks(Body newBody);
+    void updateBody(Body newBody);
     void clearScene();
     void clearBodyPart();
     void clearBodyParts();

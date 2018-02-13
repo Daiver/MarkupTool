@@ -87,7 +87,7 @@ void MarkupWindow::loadShape(QString path)
     QJsonDocument doc = LoaderJson::loadJson(path);
     Body body = LoaderJson::getBodyParts(doc);
 
-    ui->graphicsView->updateBlocks(body);
+    ui->graphicsView->updateBody(body);
     ui->graphicsView->changeBodyPart(indPart);
 }
 

@@ -28,7 +28,8 @@ public:
     void clearAll();
     void clear();
     void save();
-    void loadShape(QString path);
+    bool loadShape(QString path);
+    void updateList();
 
 private slots:
     void on_actionLoad_images_triggered();

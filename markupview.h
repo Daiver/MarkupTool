@@ -21,6 +21,10 @@ public:
     void clearScene();
     void clearBodyPart();
     void clearBodyParts();
+    float getSegmentProjParam(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
+    QPointF projectPoint2Segment(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
+    float distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
+    bool clickOnLandmark(const QPointF &point);
 
     QVector<QPointF> getBodyPart(int indBlock) const;
     QVector<QPointF> getUpPart(int indBLock) const;
@@ -35,7 +39,7 @@ public slots:
     void mouseMoveEvent(QMouseEvent *event) override;
     void updatePart();
 
-private:
+public:
     QGraphicsScene *scene = nullptr;
     QGraphicsItem *imageOpened = nullptr;
 

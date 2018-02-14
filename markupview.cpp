@@ -49,7 +49,9 @@ void MarkupView::updatePart()
         pathLeftEye.lineTo(body->parts[body->indActived].points[indLeftEye]->scenePos());
     pathLeftEye.lineTo(body->parts[body->indActived].points[0]->scenePos());
     body->parts[body->indActived].path = new QGraphicsPathItem(pathLeftEye);
-    body->parts[body->indActived].path->setPen(QPen(Qt::red));
+    QPen pen(Qt::red);
+    pen.setWidth(0.1);
+    body->parts[body->indActived].path->setPen(pen);
     scene->addItem(body->parts[body->indActived].path);
 }
 
@@ -123,6 +125,49 @@ void MarkupView::clearBodyParts()
 
 
 
+float MarkupView::getSegmentProjParam(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+{
+    float evLong = sqrt(pow(p1.x()-p1.y(), 2) + pow(p2.x()-p2.y(), 2));
+    float dotProd = QPointF::dotProduct(point-p1, p2 - p1)/evLong;
+    float one = 1;
+    float zero = 0;
+    float min = std::min(one, dotProd);
+    return std::max(zero,min);
+}
+
+
+
+QPointF MarkupView::projectPoint2Segment(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+{
+    float t = getSegmentProjParam(point, p1, p2);
+    return p1 + t * (p2 - p1);
+}
+
+
+
+float MarkupView::distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+{
+    QPointF projection = projectPoint2Segment(point, p1, p2);
+    float evLong = sqrt(pow(point.x()-point.y(), 2) + pow(projection.x()-projection.y(), 2));
+    return evLong;
+}
+
+
+
+bool MarkupView::clickOnLandmark(const QPointF &point)
+{
+    for (int indPoint = 0; indPoint < body->parts[body->indActived].points.size(); indPoint++){
+        QPointF landmark = body->parts[body->indActived].points[indPoint]->scenePos();
+        bool amongX = (point.x() < landmark.x()+5) && (point.x() > landmark.x()-5);
+        bool amongY = (point.y() < landmark.y()+5) && (point.y() > landmark.y()-5);
+        if (amongX && amongY)
+            return true;
+    }
+    return false;
+}
+
+
+
 QVector<QPointF> MarkupView::getBodyPart(int indBlock) const
 {
     QVector<QPointF> leftEye;
@@ -183,6 +228,30 @@ QVector<QPointF> MarkupView::getCorner(int indBLock) const
 
 void MarkupView::addPointInPart(Landmark *landmark)
 {
+    /*
+    int indInsert = 0;
+    float lineMin = 10000000000;
+
+    for (int indPoint = 0; indPoint < body->parts[body->indActived].points.size(); indPoint++){
+        int prev = indPoint;
+        int next = indPoint+1;
+        if (next == body->parts[body->indActived].points.size())
+            next = 0;
+        QPointF pt = body->parts[body->indActived].points[prev]->scenePos();
+        QPointF pt1  = body->parts[body->indActived].points[next]->scenePos();
+        QPointF pt2 = landmark->scenePos();
+        indInsert = prev+1;
+
+        float line = distFromPoint2SegmentSq(pt, pt1, pt2);
+        if (line < lineMin){
+            lineMin = line;
+            indInsert = prev+1;
+        }
+    }
+
+    body->parts[body->indActived].addPoint(landmark, indInsert);
+    */
+
     int indInsert = 0;
     float lineMin = 100000000;
     float indMin = 0;
@@ -213,8 +282,8 @@ void MarkupView::addPointInPart(Landmark *landmark)
             return;
         }
     }
-
     body->parts[body->indActived].addPoint(landmark, indMin);
+
 }
 
 
@@ -241,9 +310,13 @@ void MarkupView::wheelEvent(QWheelEvent *event)
 
 void MarkupView::mousePressEvent(QMouseEvent *event)
 {
+    if (event->modifiers() == Qt::ShiftModifier)
+        this->setDragMode(DragMode::ScrollHandDrag);
+
     QGraphicsView::mousePressEvent(event);
-    viewport()->setCursor(Qt::CrossCursor);
-    if (event->button() != Qt::RightButton)
+    if (event->modifiers() != Qt::ShiftModifier)
+        viewport()->setCursor(Qt::CrossCursor);
+    if (event->button() != Qt::LeftButton || event->modifiers() == Qt::ShiftModifier || clickOnLandmark(mapToScene(event->pos())))
         return;
 
     QPointF position = mapToScene(event->pos());
@@ -261,6 +334,7 @@ void MarkupView::mousePressEvent(QMouseEvent *event)
 void MarkupView::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
-    viewport()->setCursor(Qt::CrossCursor);
+    if (event->modifiers() != Qt::ShiftModifier)
+        viewport()->setCursor(Qt::CrossCursor);
     //qDebug() << mapToScene(event->pos());
 }

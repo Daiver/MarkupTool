@@ -78,17 +78,47 @@ void MarkupWindow::save()
 
 
 
-void MarkupWindow::loadShape(QString path)
+bool MarkupWindow::loadShape(QString path)
 {
     QFile file(path);
     if (!file.exists())
-        return;
+        return false;
 
     QJsonDocument doc = LoaderJson::loadJson(path);
     Body body = LoaderJson::getBodyParts(doc);
 
     ui->graphicsView->updateBody(body);
     ui->graphicsView->changeBodyPart(indPart);
+    updateList();
+    return true;
+}
+
+
+
+void MarkupWindow::updateList()
+{
+    for (int ind = 0; ind < imagesPaths.size(); ind++){
+        QString path = imagesPaths[ind];
+        path.remove(path.size()-3, 3);
+        path += "json";
+
+        QFile file(path);
+        if (!file.exists()){
+            ui->listWidget->item(ind)->setForeground(Qt::red);
+            continue;
+        }
+        QJsonDocument doc = LoaderJson::loadJson(path);
+        Body body = LoaderJson::getBodyParts(doc);
+
+        if (body.parts[ui->graphicsView->body->indActived].corner.size() == 0)
+        {
+            ui->listWidget->item(ind)->setForeground(Qt::red);
+        }
+        else
+        {
+            ui->listWidget->item(ind)->setForeground(Qt::black);
+        }
+    }
 }
 
 
@@ -96,7 +126,17 @@ void MarkupWindow::on_actionLoad_images_triggered()
 {
     imagesPaths = QFileDialog::getOpenFileNames(this, "load images", "/home/radiatus/Dataset/", "Images (*.png *.jpg)");
     ui->listWidget->clear();
-    ui->listWidget->addItems(imagesPaths);
+    QStringList newImagePath;
+    for (int indImg = 0; indImg < imagesPaths.size(); indImg++){
+        QString path = imagesPaths[indImg];
+        QStringList list = path.split("/");
+        QString pathNew = list.last();
+        newImagePath.push_back(pathNew);
+    }
+    ui->listWidget->addItems(newImagePath   );
+
+    updateList();
+
     showImage(0);
     QString path = imagesPaths[0];
     path.remove(path.size()-3, 3);
@@ -154,6 +194,17 @@ void MarkupWindow::on_listWidget_itemDoubleClicked(QListWidgetItem *item)
 {
     save();
     QString imageName = item->text();
+
+    for (int indImg = 0; indImg < imagesPaths.size(); indImg++){
+        QString path = imagesPaths[indImg];
+        QStringList list = path.split("/");
+        QString last = list.last();
+        if (imageName == last){
+            imageName = path;
+            break;
+        }
+    }
+
     showImage(imageName);
     if (indOpenedFile == -1)
         return;
@@ -169,6 +220,7 @@ void MarkupWindow::on_actionLeft_Eye_triggered()
 {
     indPart = 0;
     ui->graphicsView->changeBodyPart(indPart);
+    updateList();
 }
 
 
@@ -176,6 +228,7 @@ void MarkupWindow::on_actionRight_Eye_triggered()
 {
     indPart = 1;
     ui->graphicsView->changeBodyPart(indPart);
+    updateList();
 }
 
 
@@ -183,6 +236,7 @@ void MarkupWindow::on_actionMouth_triggered()
 {
     indPart = 2;
     ui->graphicsView->changeBodyPart(indPart);
+    updateList();
 }
 
 

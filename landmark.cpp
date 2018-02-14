@@ -19,18 +19,18 @@ Landmark::Landmark(qreal x, qreal y, qreal w, qreal h, int indPoint)
 
 void Landmark::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    if (end){
+    if (end || !up){
         pen.setColor(Qt::blue);
         brush.setColor(Qt::blue);
     }
 
-    if (start){
-        pen.setColor(Qt::green);
-        brush.setColor(Qt::green);
+    if (start || up){
+        pen.setColor(Qt::red);
+        brush.setColor(Qt::red);
     }
 
     QRectF rect = this->boundingRect();
-    rect.setCoords(rect.left()-0.5, rect.top()-0.5, rect.right(), rect.bottom());
+    rect.setCoords(rect.left()-2, rect.top()-2, rect.right(), rect.bottom());
     painter->setPen(pen);
     painter->setBrush(brush);
     painter->drawEllipse(rect);

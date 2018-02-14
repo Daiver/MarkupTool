@@ -11,7 +11,8 @@ struct Part
     void addPoint (Landmark* point, int indInsert);
     void loadPoint (Landmark* point, int indInsert);
 
-    QGraphicsPathItem *path = nullptr;
+    QGraphicsPathItem *pathUp = nullptr;
+    QGraphicsPathItem *pathDown = nullptr;
     QList<Landmark*> points;
 
     QVector<QPointF> corner;

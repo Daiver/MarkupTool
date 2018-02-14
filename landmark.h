@@ -25,6 +25,7 @@ public:
     bool start = false;
     bool end = false;
     int indPoint;
+    bool up = false;
     QPen pen;
     QBrush brush;
 };

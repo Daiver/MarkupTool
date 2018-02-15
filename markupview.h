@@ -21,11 +21,9 @@ public:
     void clearScene();
     void clearBodyPart();
     void clearBodyParts();
-
     float getSegmentProjParam(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
     QPointF projectPoint2Segment(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
     float distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
-
     float getDistance(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
     bool clickOnLandmark(const QPointF &point);
 
@@ -36,6 +34,7 @@ public:
     void addPointInPart(Landmark *landmark);
     void changeBodyPart(int indBlock);
 
+    QPainterPath buildSpline(const QPolygonF &points);
 public slots:
     void wheelEvent(QWheelEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;

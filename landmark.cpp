@@ -30,7 +30,7 @@ void Landmark::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     QRectF rect = this->boundingRect();
-    rect.setCoords(rect.left()-2, rect.top()-2, rect.right(), rect.bottom());
+    rect.setCoords(rect.left()-0.25, rect.top()-0.25, rect.right(), rect.bottom());
     painter->setPen(pen);
     painter->setBrush(brush);
     painter->drawEllipse(rect);

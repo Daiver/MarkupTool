@@ -89,9 +89,16 @@
     <addaction name="actionRight_Eye"/>
     <addaction name="actionMouth"/>
    </widget>
+   <widget class="QMenu" name="menuInfo">
+    <property name="title">
+     <string>Info</string>
+    </property>
+    <addaction name="actionCount_ready"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuControl"/>
    <addaction name="menuBlocks"/>
+   <addaction name="menuInfo"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -165,6 +172,11 @@
   <action name="actionClear">
    <property name="text">
     <string>Clear</string>
+   </property>
+  </action>
+  <action name="actionCount_ready">
+   <property name="text">
+    <string>Count ready</string>
    </property>
   </action>
  </widget>

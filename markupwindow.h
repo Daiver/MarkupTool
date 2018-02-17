@@ -10,6 +10,7 @@
 #include "loaderjson.h"
 #include "markupview.h"
 #include "body.h"
+#include "QMessageBox"
 
 namespace Ui {
 class MarkupWindow;
@@ -44,6 +45,8 @@ private slots:
     void on_actionMouth_triggered();
 
     void on_actionClear_triggered();
+
+    void on_actionCount_ready_triggered();
 
 private:
     Ui::MarkupWindow *ui = nullptr;

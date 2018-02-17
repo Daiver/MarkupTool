@@ -111,13 +111,9 @@ void MarkupWindow::updateList()
         Body body = LoaderJson::getBodyParts(doc);
 
         if (body.parts[ui->graphicsView->body->indActived].corner.size() == 0)
-        {
             ui->listWidget->item(ind)->setForeground(Qt::red);
-        }
         else
-        {
             ui->listWidget->item(ind)->setForeground(Qt::black);
-        }
     }
 }
 
@@ -243,4 +239,29 @@ void MarkupWindow::on_actionMouth_triggered()
 void MarkupWindow::on_actionClear_triggered()
 {
     clear();
+}
+
+void MarkupWindow::on_actionCount_ready_triggered()
+{
+    int count = 0;
+    for (int ind = 0; ind < imagesPaths.size(); ind++){
+        QString path = imagesPaths[ind];
+        path.remove(path.size()-3, 3);
+        path += "json";
+
+        QFile file(path);
+        if (!file.exists())
+            continue;
+
+        QJsonDocument doc = LoaderJson::loadJson(path);
+        Body body = LoaderJson::getBodyParts(doc);
+
+        if (body.parts[ui->graphicsView->body->indActived].corner.size() != 0)
+            count++;
+    }
+
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Count ready");
+    msgBox.setText(QString::number(count));
+    msgBox.exec();
 }

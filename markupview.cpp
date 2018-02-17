@@ -200,7 +200,7 @@ void MarkupView::clearBodyParts()
 float MarkupView::getDistance(const QPointF &point, const QPointF &p1, const QPointF &p2) const
 {
     float a = std::abs((p2.y() - p1.y())*point.x() - (p2.x()-p1.x())*point.y() + p2.x()*p1.y() - p2.y()*p1.x());
-    float b = sqrt(pow(p2.y()-p1.y(), 2) + pow(p2.x()-p1.x(), 2));
+    float b = sqrt((p2.y()-p1.y())*(p2.y()-p1.y()) + (p2.x()-p1.x())*(p2.x()-p1.x()));
     return a/b;
 }
 

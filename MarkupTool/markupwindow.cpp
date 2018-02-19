@@ -168,6 +168,8 @@ void MarkupWindow::on_comboBoxBodyPart_activated(int index)
 void MarkupWindow::on_actionClear_triggered()
 {
     ui->markupView->clearAllPart(indPart);
+    int ind = indPart;
+    int a =0;
 }
 
 

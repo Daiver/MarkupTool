@@ -195,6 +195,7 @@ void MarkupView::clear(int indPart)
 {
     clearPoints(indPart);
     clearPath(indPart);
+    body->parts[indPart].update();
 }
 
 
@@ -203,6 +204,8 @@ void MarkupView::clearAllPart(int indPart)
 {
     clearScene(indPart);
     clear(indPart);
+    Body *b = body;
+    int a =0;
 }
 
 

@@ -10,6 +10,9 @@
     <height>300</height>
    </rect>
   </property>
+  <property name="cursor">
+   <cursorShape>ArrowCursor</cursorShape>
+  </property>
   <property name="windowTitle">
    <string>MarkupWindow</string>
   </property>
@@ -27,6 +30,9 @@
     </item>
     <item row="0" column="0" rowspan="4">
      <widget class="MarkupView" name="markupView">
+      <property name="cursor" stdset="0">
+       <cursorShape>ArrowCursor</cursorShape>
+      </property>
       <property name="dragMode">
        <enum>QGraphicsView::NoDrag</enum>
       </property>
@@ -116,8 +122,15 @@
     <addaction name="actionNext"/>
     <addaction name="actionPast"/>
    </widget>
+   <widget class="QMenu" name="menuLadnmarks">
+    <property name="title">
+     <string>Ladnmarks</string>
+    </property>
+    <addaction name="actionDelete"/>
+   </widget>
    <addaction name="menuFiles"/>
    <addaction name="menuControl"/>
+   <addaction name="menuLadnmarks"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <attribute name="toolBarArea">
@@ -162,6 +175,14 @@
   <action name="actionSave_shape">
    <property name="text">
     <string>Save shape</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Delete</string>
    </property>
   </action>
  </widget>

@@ -10,6 +10,7 @@ struct Part
 {
     void addPoint (Landmark* point, int indInsert);
     void loadPoint (Landmark* point, int indInsert);
+    void deletePoint(int indPoint);
     void update();
     int pointsSize() const;
 

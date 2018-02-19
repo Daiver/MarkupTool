@@ -40,6 +40,14 @@ void Part::loadPoint(Landmark *point, int indInsert)
 
 
 
+void Part::deletePoint(int indPoint)
+{
+    points.removeAt(indPoint);
+    update();
+}
+
+
+
 void Part::update()
 {
     corner.clear();

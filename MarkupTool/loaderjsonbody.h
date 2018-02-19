@@ -6,7 +6,7 @@
 
 namespace LoaderJSON
 {
-    Body getBodyParts(const QJsonDocument &doc);
+    Body getBody(const QJsonDocument &doc);
     QJsonDocument createJson(const Body *body);
 }
 

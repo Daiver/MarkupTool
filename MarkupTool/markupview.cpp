@@ -128,6 +128,30 @@ void MarkupView::setBody(Body newBody)
 
 
 
+void MarkupView::setDeleteOption(bool option)
+{
+    this->deleteOption = option;
+}
+
+
+
+void MarkupView::deleteLandmark(const QPointF &click)
+{
+    clearScene(body->indActived);
+    for (int indPoint = 0; indPoint < body->getActivedPart()->points.size(); indPoint++){
+        QPointF landmark = body->getActivedPart()->points[indPoint]->scenePos();
+        bool amongX = (click.x() < landmark.x()+sizeLandmark*5) && (click.x() > landmark.x()-sizeLandmark*5);
+        bool amongY = (click.y() < landmark.y()+sizeLandmark*5) && (click.y() > landmark.y()-sizeLandmark*5);
+        if (amongX && amongY){
+            body->getActivedPart()->deletePoint(indPoint);
+        }
+    }
+    updateBodyPoints();
+    updateBodyPath();
+}
+
+
+
 void MarkupView::clearScenePoints(int indPart)
 {
     for (int indItem = 0; indItem < body->parts[indPart].pointsSize(); indItem++)
@@ -278,16 +302,22 @@ void MarkupView::mousePressEvent(QMouseEvent *event)
 {
     if (event->modifiers() == Qt::ShiftModifier)
         this->setDragMode(DragMode::ScrollHandDrag);
+    else
+        this->setDragMode(DragMode::NoDrag);
 
-    QGraphicsView::mousePressEvent(event);
-    if (event->modifiers() != Qt::ShiftModifier)
+    if (deleteOption == false)
+        QGraphicsView::mousePressEvent(event);
+
+    if (deleteOption == true)
+        viewport()->setCursor(Qt::PointingHandCursor);
+    else if (event->modifiers() != Qt::ShiftModifier)
         viewport()->setCursor(Qt::CrossCursor);
 
     bool isLeftButton = (event->button() == Qt::LeftButton);
     bool isModifiers = (event->modifiers() == Qt::ShiftModifier);
     bool isClickedMark = clickOnLandmark(mapToScene(event->pos()), sizeLandmark*5);
 
-    if (!isLeftButton || isModifiers || isClickedMark)
+    if (!isLeftButton || isModifiers || isClickedMark || deleteOption == true)
         return;
 
     QPointF position = mapToScene(event->pos());
@@ -300,7 +330,9 @@ void MarkupView::mousePressEvent(QMouseEvent *event)
 void MarkupView::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
-    if (event->modifiers() != Qt::ShiftModifier)
+    if (deleteOption == true)
+        viewport()->setCursor(Qt::PointingHandCursor);
+    else if (event->modifiers() != Qt::ShiftModifier)
         viewport()->setCursor(Qt::CrossCursor);
 }
 
@@ -309,7 +341,9 @@ void MarkupView::mouseMoveEvent(QMouseEvent *event)
 void MarkupView::mouseReleaseEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseReleaseEvent(event);
-    if (event->modifiers() != Qt::ShiftModifier)
+    if (deleteOption == true)
+        viewport()->setCursor(Qt::PointingHandCursor);
+    else if (event->modifiers() != Qt::ShiftModifier)
         viewport()->setCursor(Qt::CrossCursor);
 }
 
@@ -318,6 +352,16 @@ void MarkupView::mouseReleaseEvent(QMouseEvent *event)
 void MarkupView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseDoubleClickEvent(event);
-    if (event->modifiers() != Qt::ShiftModifier)
+    if (deleteOption == true)
+        viewport()->setCursor(Qt::PointingHandCursor);
+    else if (event->modifiers() != Qt::ShiftModifier)
         viewport()->setCursor(Qt::CrossCursor);
+
+    bool isLeftButton = (event->button() == Qt::LeftButton);
+    bool isClickedMark = clickOnLandmark(mapToScene(event->pos()), sizeLandmark*5);
+
+    if (!isLeftButton || !isClickedMark || deleteOption == false)
+        return;
+
+    deleteLandmark(mapToScene(event->pos()));
 }

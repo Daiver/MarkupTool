@@ -1,7 +1,7 @@
 #include "loaderjsonbody.h"
 
 
-Body LoaderJSON::getBodyParts(const QJsonDocument &doc)
+Body LoaderJSON::getBody(const QJsonDocument &doc)
 {
     QJsonObject obj = doc.object();
 

@@ -50,7 +50,7 @@ void MarkupWindow::loadShape(QString path)
         return;
 
     QJsonDocument doc = LoaderJSON::loadJson(path);
-    Body body = LoaderJSON::getBodyParts(doc);
+    Body body = LoaderJSON::getBody(doc);
     ui->markupView->setBody(body);
     updateListFiles();
 }
@@ -97,7 +97,7 @@ void MarkupWindow::updateListFiles() const
         }
 
         QJsonDocument doc = LoaderJSON::loadJson(path);
-        Body body = LoaderJSON::getBodyParts(doc);
+        Body body = LoaderJSON::getBody(doc);
 
         if (body.parts[indPart].corner.size() == 0){
             ui->listFiles->item(indImg)->setForeground(Qt::red);
@@ -200,4 +200,17 @@ void MarkupWindow::on_listFiles_itemDoubleClicked(QListWidgetItem *item)
     }
 
     showImage(indOpenedImage);
+}
+
+
+
+void MarkupWindow::on_actionDelete_triggered()
+{
+
+}
+
+
+void MarkupWindow::on_actionDelete_triggered(bool checked)
+{
+    ui->markupView->setDeleteOption(checked);
 }

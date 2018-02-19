@@ -37,6 +37,10 @@ private slots:
     void on_actionSave_shape_triggered();
     void on_listFiles_itemDoubleClicked(QListWidgetItem *item);
 
+    void on_actionDelete_triggered();
+
+    void on_actionDelete_triggered(bool checked);
+
 private:
     bool isContained(const int &ind, const int &size) const;
     void loadShape(QString path);

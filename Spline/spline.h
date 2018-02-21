@@ -2,6 +2,7 @@
 #define SPLINES_H
 
 #include <QPainterPath>
+#include <cmath>
 
 namespace Spline{
     QPainterPath build(const QPolygonF &points);

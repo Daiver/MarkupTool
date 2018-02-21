@@ -24,6 +24,7 @@ public:
     void changeSizeLandmark(const double &size);
     void changeBodyPart(int indBlock);
     void setBody(Body newBody);
+    void setAllowEdit(bool allow);
     void setDeleteOption(bool option);
     void deleteLandmark(const QPointF &click);
 
@@ -50,6 +51,7 @@ private:
     QGraphicsScene *scene = nullptr;
     QGraphicsItem *image = nullptr;
     bool deleteOption = false;
+    bool allowEdit = true;
     float sizeLandmark = 0.5;
     Body *body = new Body();
 };

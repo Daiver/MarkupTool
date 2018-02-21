@@ -66,6 +66,24 @@ void Part::update()
 
 
 
+QPointF Part::getCentral() const
+{
+    QPointF start;
+    QPointF end;
+
+    for (int indPoint = 0; indPoint < pointsSize(); indPoint++){
+        if (points[indPoint]->getEnd() == true)
+            end = points[indPoint]->scenePos();
+        if (points[indPoint]->getStart() == true)
+            start = points[indPoint]->scenePos();
+    }
+
+    QPointF central = end-start;
+    return central;
+}
+
+
+
 int Part::pointsSize() const
 {
     return points.size();

@@ -41,6 +41,10 @@ private slots:
 
     void on_actionDelete_triggered(bool checked);
 
+    void on_actionUpdate_from_JSON_triggered();
+
+    void on_editButton_clicked(bool checked);
+
 private:
     bool isContained(const int &ind, const int &size) const;
     void loadShape(QString path);

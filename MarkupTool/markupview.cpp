@@ -122,8 +122,17 @@ void MarkupView::setBody(Body newBody)
         }
     }
 
+    QPointF central = body->getActivedPart()->getCentral();
+    QPointF centralNow = viewport()->rect().center();
     updateBodyPoints();
     updateBodyPath();
+}
+
+
+
+void MarkupView::setAllowEdit(bool allow)
+{
+    this->allowEdit = allow;
 }
 
 
@@ -320,7 +329,7 @@ void MarkupView::mousePressEvent(QMouseEvent *event)
     bool isModifiers = (event->modifiers() == Qt::ShiftModifier);
     bool isClickedMark = clickOnLandmark(mapToScene(event->pos()), sizeLandmark*5);
 
-    if (!isLeftButton || isModifiers || isClickedMark || deleteOption == true)
+    if (!isLeftButton || isModifiers || isClickedMark || deleteOption == true || allowEdit == false)
         return;
 
     QPointF position = mapToScene(event->pos());

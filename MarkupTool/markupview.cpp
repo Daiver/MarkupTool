@@ -121,11 +121,19 @@ void MarkupView::setBody(Body newBody)
             body->parts[indPart].loadPoint(landmark, indPoint);
         }
     }
-
-    QPointF central = body->getActivedPart()->getCentral();
-    QPointF centralNow = viewport()->rect().center();
+    if (body->getActivedPart()->pointsSize() > 0)
+        this->centerOn(body->getActivedPart()->points.first());
+    //QPointF central = body->getActivedPart()->getCentral();
+    //QPointF centralNow = viewport()->rect().center();
     updateBodyPoints();
     updateBodyPath();
+}
+
+
+
+QGraphicsScene *MarkupView::getScene()
+{
+    return scene;
 }
 
 

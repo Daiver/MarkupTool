@@ -224,7 +224,6 @@ void MarkupWindow::on_actionUpdate_from_JSON_triggered()
 {
     QString pathShape = images->getFilePath(indOpenedImage).dir + images->getFilePath(indOpenedImage).name + ".json";
     loadShape(pathShape);
-
 }
 
 

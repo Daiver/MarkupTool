@@ -232,7 +232,6 @@ void MarkupView::clearAllPart(int indPart)
     clearScene(indPart);
     clear(indPart);
     Body *b = body;
-    int a =0;
 }
 
 

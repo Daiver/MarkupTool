@@ -85,6 +85,7 @@ void MarkupView::changeBodyPart(int indPart)
 {
     clearScene(body->indActived);
     body->indActived = indPart;
+    centralOnSegment();
     updateBodyPoints();
     updateBodyPath();
 }
@@ -93,8 +94,10 @@ void MarkupView::changeBodyPart(int indPart)
 
 void MarkupView::setBody(Body newBody)
 {
+    int indActived = body->indActived;
     clearScene(body->indActived);
     body = new Body();
+    body->indActived = indActived;
 
     for (int indPart = 0; indPart < newBody.parts.size(); indPart++){
         int indPoint = 0;
@@ -121,11 +124,10 @@ void MarkupView::setBody(Body newBody)
             body->parts[indPart].loadPoint(landmark, indPoint);
         }
     }
-    if (body->getActivedPart()->pointsSize() > 4)
-        this->centerOn(body->getActivedPart()->getCentral());
 
     updateBodyPoints();
     updateBodyPath();
+    centralOnSegment();
 }
 
 
@@ -133,6 +135,15 @@ void MarkupView::setBody(Body newBody)
 QGraphicsScene *MarkupView::getScene()
 {
     return scene;
+}
+
+
+
+void MarkupView::centralOnSegment()
+{
+    int i = body->indActived;
+    if (body->getActivedPart()->pointsSize() > 4)
+        this->centerOn(body->getActivedPart()->getCentral());
 }
 
 
@@ -230,7 +241,9 @@ void MarkupView::clearAll()
 {
     for (int indPart = 0; indPart < body->parts.size(); indPart++)
         clearAllPart(indPart);
+    int indActivedPart = body->indActived;
     body = new Body();
+    body->indActived = indActivedPart;
 }
 
 

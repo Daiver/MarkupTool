@@ -25,6 +25,7 @@ public:
     void changeBodyPart(int indBlock);
     void setBody(Body newBody);
     QGraphicsScene* getScene();
+    void centralOnSegment();
     void setAllowEdit(bool allow);
     void setDeleteOption(bool option);
     void deleteLandmark(const QPointF &click);

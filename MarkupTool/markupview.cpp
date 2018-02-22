@@ -121,10 +121,9 @@ void MarkupView::setBody(Body newBody)
             body->parts[indPart].loadPoint(landmark, indPoint);
         }
     }
-    if (body->getActivedPart()->pointsSize() > 0)
-        this->centerOn(body->getActivedPart()->points.first());
-    //QPointF central = body->getActivedPart()->getCentral();
-    //QPointF centralNow = viewport()->rect().center();
+    if (body->getActivedPart()->pointsSize() > 4)
+        this->centerOn(body->getActivedPart()->getCentral());
+
     updateBodyPoints();
     updateBodyPath();
 }

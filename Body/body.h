@@ -12,7 +12,9 @@ struct Part
     void loadPoint (Landmark* point, int indInsert);
     void deletePoint(int indPoint);
     void update();
-    QPointF getCentral() const;
+    Landmark* getEnd();
+    Landmark* getStart();
+    QPointF getCentral();
     int pointsSize() const;
 
     QGraphicsPathItem *pathUp = nullptr;

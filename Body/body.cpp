@@ -66,19 +66,34 @@ void Part::update()
 
 
 
-QPointF Part::getCentral() const
+Landmark *Part::getEnd()
 {
-    QPointF start;
-    QPointF end;
-
-    for (int indPoint = 0; indPoint < pointsSize(); indPoint++){
+    for (int indPoint = 0; indPoint < pointsSize(); indPoint++)
         if (points[indPoint]->getEnd() == true)
-            end = points[indPoint]->scenePos();
-        if (points[indPoint]->getStart() == true)
-            start = points[indPoint]->scenePos();
-    }
+            return points[indPoint];
 
-    QPointF central = end-start;
+    return nullptr;
+}
+
+
+
+Landmark *Part::getStart()
+{
+    for (int indPoint = 0; indPoint < pointsSize(); indPoint++)
+        if (points[indPoint]->getStart() == true)
+            return points[indPoint];
+
+    return nullptr;
+}
+
+
+
+QPointF Part::getCentral()
+{
+    QPointF start = getStart()->scenePos();
+    QPointF end = getEnd()->scenePos();
+
+    QPointF central = (end+start)/2;
     return central;
 }
 

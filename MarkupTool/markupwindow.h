@@ -45,10 +45,13 @@ private slots:
 
     void on_editButton_clicked(bool checked);
 
+    void on_actionSave_shapeas_triggered();
+
 private:
     bool isContained(const int &ind, const int &size) const;
     void loadShape(QString path);
     void saveShape() const;
+    void saveShape(QString filePath) const;
 
 private:
     Ui::MarkupWindow *ui = nullptr;

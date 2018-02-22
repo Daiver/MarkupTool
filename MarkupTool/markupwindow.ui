@@ -124,9 +124,11 @@
      <string>Files</string>
     </property>
     <addaction name="loadFacesAction"/>
-    <addaction name="actionLoad_shape"/>
     <addaction name="actionUpdate_from_JSON"/>
+    <addaction name="actionLoad_shape"/>
     <addaction name="actionSave_shape"/>
+    <addaction name="actionSave_shapeas"/>
+    <addaction name="separator"/>
     <addaction name="actionClear"/>
    </widget>
    <widget class="QMenu" name="menuControl">
@@ -138,7 +140,7 @@
    </widget>
    <widget class="QMenu" name="menuLadnmarks">
     <property name="title">
-     <string>Ladnmarks</string>
+     <string>Landmarks</string>
     </property>
     <addaction name="actionDelete"/>
    </widget>
@@ -652,12 +654,15 @@
   </action>
   <action name="actionLoad_shape">
    <property name="text">
-    <string>Load shape</string>
+    <string>Load shape as..</string>
    </property>
   </action>
   <action name="actionSave_shape">
    <property name="text">
     <string>Save shape</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
   <action name="actionDelete">
@@ -673,10 +678,15 @@
   </action>
   <action name="actionUpdate_from_JSON">
    <property name="text">
-    <string>Update from JSON</string>
+    <string>Load shape</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionSave_shapeas">
+   <property name="text">
+    <string>Save shape as..</string>
    </property>
   </action>
  </widget>

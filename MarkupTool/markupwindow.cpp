@@ -59,14 +59,20 @@ void MarkupWindow::loadShape(QString path)
 
 void MarkupWindow::saveShape() const
 {
+    FilePath imagePath = images->getFilePath(indOpenedImage);
+    QString path = imagePath.dir + imagePath.name + ".json";
+    saveShape(path);
+}
+
+
+
+void MarkupWindow::saveShape(QString filePath) const
+{
     if (indOpenedImage == -1)
         return;
 
-    FilePath imagePath = images->getFilePath(indOpenedImage);
-    QString path = imagePath.dir + imagePath.name + ".json";
-
+    QString path = filePath;
     Body *body = ui->markupView->getBody();
-
     QJsonDocument doc = LoaderJSON::createJson(body);
     LoaderJSON::saveJson(doc, path);
 }
@@ -231,4 +237,12 @@ void MarkupWindow::on_actionUpdate_from_JSON_triggered()
 void MarkupWindow::on_editButton_clicked(bool checked)
 {
     ui->markupView->setAllowEdit(checked);
+}
+
+
+
+void MarkupWindow::on_actionSave_shapeas_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this, "Save shape", "/home/radiatus/Dataset/", "*.json");
+    saveShape(fileName);
 }

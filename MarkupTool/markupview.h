@@ -25,6 +25,11 @@ public:
     void changeBodyPart(int indBlock);
     void setBody(Body newBody);
     QGraphicsScene* getScene();
+
+    double point2SegmentProjectionParameter(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
+    QPointF projectPoint2Segment(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
+    double distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
+
     void centralOnSegment();
     void setAllowEdit(bool allow);
     void setDeleteOption(bool option);

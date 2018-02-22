@@ -36,11 +36,13 @@ bool MarkupView::clickOnLandmark(const QPointF &point, const float &radius) cons
 
 void MarkupView::addLandmark(Landmark *point)
 {
-    if (body->getActivedPart()->pointsSize() < 3){
+    if (body->getActivedPart()->pointsSize() < 4){
         int ind = 0;
         for (int indPoint = 0; indPoint < body->getActivedPart()->pointsSize(); indPoint++)
             ind++;
         body->getActivedPart()->addPoint(point, ind);
+        if(body->getActivedPart()->pointsSize() == 4)
+           updateBodyPath();
     }
     else {
         float lineMin = 100000000;
@@ -58,7 +60,8 @@ void MarkupView::addLandmark(Landmark *point)
             float x = point->x();
             float y = point->y();
 
-            float line = (y1-y2)*x + (x2-x1)*y + (x1*y2-x2*y1);
+            QPointF prevPoint = body->getActivedPart()->points[prev]->scenePos();
+            float line = sqrt((point->x()-prevPoint.x())*(point->x()-prevPoint.x()) + (point->y()-prevPoint.y())*(point->y()-prevPoint.y()));//(y1-y2)*x + (x2-x1)*y + (x1*y2-x2*y1);//distFromPoint2SegmentSq(point->scenePos(),body->getActivedPart()->points[prev]->scenePos(), body->getActivedPart()->points[next]->scenePos() );
             if (line < lineMin){
                 lineMin = line;
                 indMin = prev+1;
@@ -135,6 +138,31 @@ void MarkupView::setBody(Body newBody)
 QGraphicsScene *MarkupView::getScene()
 {
     return scene;
+}
+
+
+
+double MarkupView::point2SegmentProjectionParameter(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+{
+    double l2 = sqrt((p1.x()-p2.x())*(p1.x()-p2.x()) + (p1.y()-p2.y())*(p1.y()-p2.y()));
+    double product = QVector2D::dotProduct(QVector2D(point-p1), QVector2D(p2 - p1)) / l2;
+    return qMax(0.0, qMin(1.0, product));
+}
+
+
+
+QPointF MarkupView::projectPoint2Segment(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+{
+    double t = point2SegmentProjectionParameter(point, p1, p2);
+    return p1 + t * (p2 - p1);
+}
+
+
+
+double MarkupView::distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+{
+    QPointF projection = projectPoint2Segment(point, p1, p2);
+    return sqrt((projection.x()-point.x())*(projection.x()-point.x()) + (projection.y()-point.y())*(projection.y()-point.y())); //(point, projection);
 }
 
 

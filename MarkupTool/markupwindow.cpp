@@ -244,5 +244,5 @@ void MarkupWindow::on_editButton_clicked(bool checked)
 void MarkupWindow::on_actionSave_shapeas_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Save shape", "/home/radiatus/Dataset/", "*.json");
-    saveShape(fileName);
+    saveShape(fileName+".json");
 }

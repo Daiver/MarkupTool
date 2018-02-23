@@ -197,17 +197,7 @@ void MarkupWindow::on_actionSave_shape_triggered()
 
 void MarkupWindow::on_listFiles_itemDoubleClicked(QListWidgetItem *item)
 {
-    saveShape();
-    FilePath imagePath;
-    for (int indImg = 0; indImg < images->size(); indImg++){
-        QString name = images->getFilePath(indImg).name;
-        if (name != item->text())
-            continue;
-        indOpenedImage = indImg;
-        imagePath = images->getFilePath(indImg);
-    }
-
-    showImage(indOpenedImage);
+    QApplication::clipboard()->setText(item->text());
 }
 
 
@@ -216,7 +206,6 @@ void MarkupWindow::on_actionDelete_triggered()
 {
 
 }
-
 
 
 void MarkupWindow::on_actionDelete_triggered(bool checked)
@@ -245,4 +234,22 @@ void MarkupWindow::on_actionSave_shapeas_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Save shape", "/home/radiatus/Dataset/", "*.json");
     saveShape(fileName+".json");
+}
+
+
+
+void MarkupWindow::on_listFiles_itemClicked(QListWidgetItem *item)
+{
+    QApplication::clipboard()->setText(item->text());
+    saveShape();
+    FilePath imagePath;
+    for (int indImg = 0; indImg < images->size(); indImg++){
+        QString name = images->getFilePath(indImg).name;
+        if (name != item->text())
+            continue;
+        indOpenedImage = indImg;
+        imagePath = images->getFilePath(indImg);
+    }
+
+    showImage(indOpenedImage);
 }

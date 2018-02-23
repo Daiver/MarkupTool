@@ -6,6 +6,8 @@
 #include <QImageReader>
 #include <QListWidgetItem>
 #include <QFile>
+#include <QApplication>
+#include <QClipboard>
 
 #include "filespath.h"
 #include "loaderjsonbody.h"
@@ -46,6 +48,8 @@ private slots:
     void on_editButton_clicked(bool checked);
 
     void on_actionSave_shapeas_triggered();
+
+    void on_listFiles_itemClicked(QListWidgetItem *item);
 
 private:
     bool isContained(const int &ind, const int &size) const;

@@ -25,7 +25,7 @@ public:
     ~MarkupWindow();
 
 public:
-    void updateListFiles() const;
+    void updateListFiles(const QStringList &filesNames) const;
     void showImage(const int &indImage);
 
 private slots:
@@ -38,18 +38,17 @@ private slots:
     void on_actionLoad_shape_triggered();
     void on_actionSave_shape_triggered();
     void on_listFiles_itemDoubleClicked(QListWidgetItem *item);
-
     void on_actionDelete_triggered();
-
     void on_actionDelete_triggered(bool checked);
-
     void on_actionUpdate_from_JSON_triggered();
-
     void on_editButton_clicked(bool checked);
-
     void on_actionSave_shapeas_triggered();
-
     void on_listFiles_itemClicked(QListWidgetItem *item);
+    void on_lineEdit_textChanged(const QString &arg1);
+
+    void on_horizontalSlider_valueChanged(int value);
+
+    void on_horizontalSlider_sliderMoved(int position);
 
 private:
     bool isContained(const int &ind, const int &size) const;
@@ -60,6 +59,7 @@ private:
 private:
     Ui::MarkupWindow *ui = nullptr;
     FilesPath *images = nullptr;
+    QStringList openedInList;
     int indOpenedImage = -1;
     int indPart = 0;
 };

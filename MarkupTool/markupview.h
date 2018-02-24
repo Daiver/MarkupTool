@@ -24,6 +24,8 @@ public:
     void changeSizeLandmark(const double &size);
     void changeBodyPart(int indBlock);
     void setBody(Body newBody);
+    void setScaleParam(const int &param);
+    void scaleOnSegment();
     QGraphicsScene* getScene();
 
     double point2SegmentProjectionParameter(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
@@ -59,6 +61,7 @@ private:
     QGraphicsItem *image = nullptr;
     bool deleteOption = false;
     bool allowEdit = true;
+    float scaleSegmentParam = 2;
     float sizeLandmark = 0.5;
     Body *body = new Body();
 };

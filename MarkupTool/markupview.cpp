@@ -135,6 +135,26 @@ void MarkupView::setBody(Body newBody)
 
 
 
+void MarkupView::setScaleParam(const int &param)
+{
+    scaleSegmentParam = param/10.0;
+    centralOnSegment();
+}
+
+
+
+void MarkupView::scaleOnSegment()
+{
+    QRectF box = body->getActivedPart()->getBox();
+    qreal x = box.x() - box.width()*scaleSegmentParam/2.0;
+    qreal y = box.y() - box.height()*scaleSegmentParam/2.0;
+    qreal w = box.width()*(scaleSegmentParam+1);
+    qreal h = box.height()*(scaleSegmentParam+1);
+    fitInView (QRectF(x,y,w,h), Qt::KeepAspectRatio);
+}
+
+
+
 QGraphicsScene *MarkupView::getScene()
 {
     return scene;
@@ -172,6 +192,8 @@ void MarkupView::centralOnSegment()
     int i = body->indActived;
     if (body->getActivedPart()->pointsSize() > 4)
         this->centerOn(body->getActivedPart()->getCentral());
+
+    scaleOnSegment();
 }
 
 

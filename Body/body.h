@@ -15,6 +15,7 @@ struct Part
     Landmark* getEnd();
     Landmark* getStart();
     QPointF getCentral();
+    QRect getBox() const;
     int pointsSize() const;
 
     QGraphicsPathItem *pathUp = nullptr;
@@ -31,7 +32,7 @@ struct Body
     Body();
 
     Part* getActivedPart();
-
+    bool isEmpty() const;
     QVector<Part> parts;
     int indActived = 0;
 };

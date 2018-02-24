@@ -99,6 +99,33 @@ QPointF Part::getCentral()
 
 
 
+QRect Part::getBox() const
+{
+    float xMin = 100000000, yMin = 100000000, xMax = 0, yMax = 0;
+
+    for (int indPoint = 0; indPoint < pointsSize(); indPoint++){
+        float x = points[indPoint]->scenePos().x();
+        float y = points[indPoint]->scenePos().y();
+
+        if (x > xMax)
+            xMax = x;
+        if (x < xMin)
+            xMin = x;
+        if (y > yMax)
+            yMax = y;
+        if (y < yMin)
+            yMin = y;
+    }
+
+    float w = xMax - xMin;
+    float h = yMax - yMin;
+    float x = xMin;
+    float y = yMin;
+    return QRect(x, y, w, h);
+}
+
+
+
 int Part::pointsSize() const
 {
     return points.size();
@@ -122,4 +149,15 @@ Body::Body()
 Part *Body::getActivedPart()
 {
     return &parts[indActived];
+}
+
+
+
+bool Body::isEmpty() const
+{
+    for (int indPart = 0; indPart < parts.size(); indPart++)
+        if (parts[indPart].pointsSize() != 0)
+            return false;
+
+    return true;
 }

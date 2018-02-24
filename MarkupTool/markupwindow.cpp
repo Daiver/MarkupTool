@@ -52,13 +52,16 @@ void MarkupWindow::loadShape(QString path)
     QJsonDocument doc = LoaderJSON::loadJson(path);
     Body body = LoaderJSON::getBody(doc);
     ui->markupView->setBody(body);
-    updateListFiles();
+    updateListFiles(images->getNames());
 }
 
 
 
 void MarkupWindow::saveShape() const
 {
+    if (indOpenedImage == -1)
+        return;
+
     FilePath imagePath = images->getFilePath(indOpenedImage);
     QString path = imagePath.dir + imagePath.name + ".json";
     saveShape(path);
@@ -68,20 +71,26 @@ void MarkupWindow::saveShape() const
 
 void MarkupWindow::saveShape(QString filePath) const
 {
-    if (indOpenedImage == -1)
-        return;
-
     QString path = filePath;
     Body *body = ui->markupView->getBody();
+
+    QFile file(filePath);
+    if (file.exists() && body->isEmpty()){
+        file.remove();
+        return;
+    }
+
+    if (body->isEmpty())
+        return;
+
     QJsonDocument doc = LoaderJSON::createJson(body);
     LoaderJSON::saveJson(doc, path);
 }
 
 
 
-void MarkupWindow::updateListFiles() const
+void MarkupWindow::updateListFiles(const QStringList &filesNames) const
 {
-    QStringList filesNames = images->getNames();
     ui->listFiles->clear();
     ui->listFiles->addItems(filesNames);
 
@@ -93,8 +102,8 @@ void MarkupWindow::updateListFiles() const
     ui->listFiles->setItemSelected(itemSelected, true);
 
     int indReady = 0;
-    for (int indImg = 0; indImg < images->size(); indImg++){
-        QString path = images->getFilePath(indImg).dir + images->getFilePath(indImg).name + ".json";
+    for (int indImg = 0; indImg < ui->listFiles->count(); indImg++){
+        QString path = images->getFilePath(indImg).dir + ui->listFiles->item(indImg)->text() + ".json";
 
         QFile file(path);
         if (!file.exists()){
@@ -133,7 +142,7 @@ void MarkupWindow::showImage(const int &indImage)
     ui->markupView->drawImage(image);
     QString pathShape = images->getFilePath(indImage).dir + images->getFilePath(indImage).name + ".json";
     loadShape(pathShape);
-    updateListFiles();
+    updateListFiles(images->getNames());
 }
 
 
@@ -166,7 +175,7 @@ void MarkupWindow::on_comboBoxBodyPart_activated(int index)
 {
     ui->markupView->changeBodyPart(index);
     indPart = index;
-    updateListFiles();
+    updateListFiles(images->getNames());
 }
 
 
@@ -198,6 +207,17 @@ void MarkupWindow::on_actionSave_shape_triggered()
 void MarkupWindow::on_listFiles_itemDoubleClicked(QListWidgetItem *item)
 {
     QApplication::clipboard()->setText(item->text());
+    saveShape();
+    FilePath imagePath;
+    for (int indImg = 0; indImg < images->size(); indImg++){
+        QString name = images->getFilePath(indImg).name;
+        if (name != item->text())
+            continue;
+        indOpenedImage = indImg;
+        imagePath = images->getFilePath(indImg);
+    }
+
+    showImage(indOpenedImage);
 }
 
 
@@ -217,6 +237,9 @@ void MarkupWindow::on_actionDelete_triggered(bool checked)
 
 void MarkupWindow::on_actionUpdate_from_JSON_triggered()
 {
+    if (indOpenedImage == -1)
+        return;
+
     QString pathShape = images->getFilePath(indOpenedImage).dir + images->getFilePath(indOpenedImage).name + ".json";
     loadShape(pathShape);
 }
@@ -240,16 +263,31 @@ void MarkupWindow::on_actionSave_shapeas_triggered()
 
 void MarkupWindow::on_listFiles_itemClicked(QListWidgetItem *item)
 {
-    QApplication::clipboard()->setText(item->text());
-    saveShape();
-    FilePath imagePath;
-    for (int indImg = 0; indImg < images->size(); indImg++){
-        QString name = images->getFilePath(indImg).name;
-        if (name != item->text())
-            continue;
-        indOpenedImage = indImg;
-        imagePath = images->getFilePath(indImg);
+
+}
+
+
+
+void MarkupWindow::on_lineEdit_textChanged(const QString &arg1)
+{
+    openedInList.clear();
+    for (int indFiles = 0; indFiles < images->size(); indFiles++){
+        QString fileName = images->getFilePath(indFiles).name;
+        bool isContain = fileName.contains(arg1);
+        if (isContain)
+            openedInList.push_back(fileName);
     }
 
-    showImage(indOpenedImage);
+    updateListFiles(openedInList);
+}
+
+void MarkupWindow::on_horizontalSlider_valueChanged(int value)
+{
+
+}
+
+
+void MarkupWindow::on_horizontalSlider_sliderMoved(int position)
+{
+    ui->markupView->setScaleParam(position);
 }

@@ -16,6 +16,12 @@ void MarkupView::drawImage(const QImage &image)
     QPixmap pixmap = QPixmap::fromImage(image);
     this->image = new QGraphicsPixmapItem(pixmap);
     scene->addItem(this->image);
+
+    //fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
+    //viewport()->setGeometry(this->image->x(), this->image->y(), this->image->s;
+    fitInView (this->image, Qt::KeepAspectRatio);
+    //verticalScrollBar()->setSliderPosition(1);
+    //horizontalScrollBar()->setSliderPosition(1);
 }
 
 
@@ -61,7 +67,9 @@ void MarkupView::addLandmark(Landmark *point)
             float y = point->y();
 
             QPointF prevPoint = body->getActivedPart()->points[prev]->scenePos();
-            float line = sqrt((point->x()-prevPoint.x())*(point->x()-prevPoint.x()) + (point->y()-prevPoint.y())*(point->y()-prevPoint.y()));//(y1-y2)*x + (x2-x1)*y + (x1*y2-x2*y1);//distFromPoint2SegmentSq(point->scenePos(),body->getActivedPart()->points[prev]->scenePos(), body->getActivedPart()->points[next]->scenePos() );
+            QPointF nextPoint = body->getActivedPart()->points[next]->scenePos();
+            QPointF centerLine = (nextPoint+prevPoint)/2.0;
+            float line = sqrt((point->x()-centerLine.x())*(point->x()-centerLine.x()) + (point->y()-centerLine.y())*(point->y()-centerLine.y()));//(y1-y2)*x + (x2-x1)*y + (x1*y2-x2*y1);//distFromPoint2SegmentSq(point->scenePos(),body->getActivedPart()->points[prev]->scenePos(), body->getActivedPart()->points[next]->scenePos() );
             if (line < lineMin){
                 lineMin = line;
                 indMin = prev+1;

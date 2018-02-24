@@ -6,6 +6,7 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QWheelEvent>
+#include <QScrollBar>
 
 #include "body.h"
 #include "spline.h"

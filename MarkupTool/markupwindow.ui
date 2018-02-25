@@ -191,9 +191,16 @@
     </property>
     <addaction name="actionDelete"/>
    </widget>
+   <widget class="QMenu" name="menuMarkupTool">
+    <property name="title">
+     <string>MarkupTool</string>
+    </property>
+    <addaction name="actionHelp"/>
+   </widget>
    <addaction name="menuFiles"/>
    <addaction name="menuControl"/>
    <addaction name="menuLadnmarks"/>
+   <addaction name="menuMarkupTool"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="palette">
@@ -744,6 +751,11 @@
   <action name="actionLoad_shapes">
    <property name="text">
     <string>Load shapes</string>
+   </property>
+  </action>
+  <action name="actionHelp">
+   <property name="text">
+    <string>Help</string>
    </property>
   </action>
  </widget>

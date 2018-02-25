@@ -7,6 +7,7 @@
 #include <QListWidgetItem>
 #include <QFile>
 #include <QApplication>
+#include <QMessageBox>
 #include <QClipboard>
 
 #include "filespath.h"
@@ -53,6 +54,8 @@ private slots:
     void on_actionLoad_shapes_as_triggered();
 
     void on_actionLoad_shapes_triggered();
+
+    void on_actionHelp_triggered();
 
 private:
     bool isContained(const int &ind, const int &size) const;

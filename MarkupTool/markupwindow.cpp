@@ -116,14 +116,14 @@ void MarkupWindow::updateListFiles(const QStringList &filesNames) const
 
         if (body.parts[indPart].corner.size() == 0){
             ui->listFiles->item(indImg)->setForeground(Qt::red);
+            continue;
         }
-        else{
-            ui->listFiles->item(indImg)->setForeground(Qt::black);
-            indReady++;
-        }
+
+        ui->listFiles->item(indImg)->setForeground(Qt::black);
+        indReady++;
+
     }
     ui->ready->setText("Ready: " + QString::number(indReady));
-
 }
 
 

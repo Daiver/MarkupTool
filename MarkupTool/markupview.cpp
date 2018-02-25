@@ -17,11 +17,7 @@ void MarkupView::drawImage(const QImage &image)
     this->image = new QGraphicsPixmapItem(pixmap);
     scene->addItem(this->image);
 
-    //fitInView(scene->sceneRect(), Qt::KeepAspectRatio);
-    //viewport()->setGeometry(this->image->x(), this->image->y(), this->image->s;
-    fitInView (this->image, Qt::KeepAspectRatio);
-    //verticalScrollBar()->setSliderPosition(1);
-    //horizontalScrollBar()->setSliderPosition(1);
+    //fitInView (this->image, Qt::KeepAspectRatio);
 }
 
 
@@ -49,44 +45,48 @@ void MarkupView::addLandmark(Landmark *point)
         body->getActivedPart()->addPoint(point, ind);
         if(body->getActivedPart()->pointsSize() == 4)
            updateBodyPath();
+        scene->addItem(point);
     }
-    else {
-        float lineMin = 100000000;
-        float indMin = 0;
 
-        for (int indPoint = 0; indPoint < body->getActivedPart()->points.size(); indPoint++){
-            int prev = indPoint;
-            int next = indPoint+1;
-            if (next == body->getActivedPart()->points.size())
-                next = 0;
-            float x1 = body->getActivedPart()->points[prev]->x();
-            float x2 = body->getActivedPart()->points[next]->x();
-            float y1 = body->getActivedPart()->points[prev]->y();
-            float y2 = body->getActivedPart()->points[next]->y();
-            float x = point->x();
-            float y = point->y();
 
-            QPointF prevPoint = body->getActivedPart()->points[prev]->scenePos();
-            QPointF nextPoint = body->getActivedPart()->points[next]->scenePos();
-            QPointF centerLine = (nextPoint+prevPoint)/2.0;
-            float line = sqrt((point->x()-centerLine.x())*(point->x()-centerLine.x()) + (point->y()-centerLine.y())*(point->y()-centerLine.y()));//(y1-y2)*x + (x2-x1)*y + (x1*y2-x2*y1);//distFromPoint2SegmentSq(point->scenePos(),body->getActivedPart()->points[prev]->scenePos(), body->getActivedPart()->points[next]->scenePos() );
-            if (line < lineMin){
-                lineMin = line;
-                indMin = prev+1;
-            }
+    float lineMin = 100000000;
+    float indMin = 0;
 
-            bool amongX = ((x1 < x) && (x < x2)) || ((x1 > x) && (x > x2));
-            bool amongY = ((y1 > y) && (y >y2)) || ((y1 < y) && (y < y2));
-            if (amongX && amongY){
-                body->getActivedPart()->addPoint(point, indPoint+1);
-                scene->addItem(point);
-                updateBodyPath();
-                return;
-            }
+    for (int indPoint = 0; indPoint < body->getActivedPart()->points.size(); indPoint++){
+        int prev = indPoint;
+        int next = indPoint+1;
+        if (next == body->getActivedPart()->points.size())
+            next = 0;
+        float x1 = body->getActivedPart()->points[prev]->x();
+        float x2 = body->getActivedPart()->points[next]->x();
+        float y1 = body->getActivedPart()->points[prev]->y();
+        float y2 = body->getActivedPart()->points[next]->y();
+        float x = point->x();
+        float y = point->y();
+        bool amongX = ((x1 < x) && (x < x2)) || ((x1 > x) && (x > x2));
+        bool amongY = ((y1 > y) && (y >y2)) || ((y1 < y) && (y < y2));
+
+        QPointF prevPoint = body->getActivedPart()->points[prev]->scenePos();
+        QPointF nextPoint = body->getActivedPart()->points[next]->scenePos();
+        QPointF centerLine = (nextPoint+prevPoint)/2.0;
+        float line = sqrt((point->x()-centerLine.x())*(point->x()-centerLine.x()) + (point->y()-centerLine.y())*(point->y()-centerLine.y()));
+        //(y1-y2)*x + (x2-x1)*y + (x1*y2-x2*y1);//distFromPoint2SegmentSq(point->scenePos(),body->getActivedPart()->points[prev]->scenePos(), body->getActivedPart()->points[next]->scenePos() );
+
+
+        if (line < lineMin){
+            lineMin = line;
+            indMin = prev+1;
         }
-        body->getActivedPart()->addPoint(point, indMin);
-        updateBodyPath();
+
+        if (amongX && amongY){
+            body->getActivedPart()->addPoint(point, indPoint+1);
+            scene->addItem(point);
+            updateBodyPath();
+            return;
+        }
     }
+    body->getActivedPart()->addPoint(point, indMin);
+    updateBodyPath();
     scene->addItem(point);
 }
 
@@ -96,7 +96,7 @@ void MarkupView::changeBodyPart(int indPart)
 {
     clearScene(body->indActived);
     body->indActived = indPart;
-    centralOnSegment();
+    scaleOnSegment();
     updateBodyPoints();
     updateBodyPath();
 }
@@ -138,7 +138,7 @@ void MarkupView::setBody(Body newBody)
 
     updateBodyPoints();
     updateBodyPath();
-    centralOnSegment();
+    scaleOnSegment();
 }
 
 
@@ -146,7 +146,7 @@ void MarkupView::setBody(Body newBody)
 void MarkupView::setScaleParam(const int &param)
 {
     scaleSegmentParam = param/10.0;
-    centralOnSegment();
+    scaleOnSegment();
 }
 
 
@@ -191,17 +191,6 @@ double MarkupView::distFromPoint2SegmentSq(const QPointF &point, const QPointF &
 {
     QPointF projection = projectPoint2Segment(point, p1, p2);
     return sqrt((projection.x()-point.x())*(projection.x()-point.x()) + (projection.y()-point.y())*(projection.y()-point.y())); //(point, projection);
-}
-
-
-
-void MarkupView::centralOnSegment()
-{
-    int i = body->indActived;
-    if (body->getActivedPart()->pointsSize() > 4)
-        this->centerOn(body->getActivedPart()->getCentral());
-
-    scaleOnSegment();
 }
 
 

@@ -45,9 +45,7 @@ private slots:
     void on_actionSave_shapeas_triggered();
     void on_listFiles_itemClicked(QListWidgetItem *item);
     void on_lineEdit_textChanged(const QString &arg1);
-
     void on_horizontalSlider_valueChanged(int value);
-
     void on_horizontalSlider_sliderMoved(int position);
 
 private:

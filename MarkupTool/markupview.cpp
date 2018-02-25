@@ -140,6 +140,9 @@ void MarkupView::setScaleParam(const int &param)
 
 void MarkupView::scaleOnSegment()
 {
+    if (body->getActivedPart()->pointsSize() == 0)
+        return;
+
     QRectF box = body->getActivedPart()->getBox();
     qreal x = box.x() - box.width()*scaleSegmentParam/2.0;
     qreal y = box.y() - box.height()*scaleSegmentParam/2.0;

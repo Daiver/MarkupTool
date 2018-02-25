@@ -17,7 +17,10 @@ void MarkupView::drawImage(const QImage &image)
     this->image = new QGraphicsPixmapItem(pixmap);
     scene->addItem(this->image);
 
-    //fitInView (this->image, Qt::KeepAspectRatio);
+    if (isScaleSave == true)
+        return;
+
+    fitInView (this->image, Qt::KeepAspectRatio); // положение прим смене лица нарушится
 }
 
 
@@ -46,8 +49,8 @@ void MarkupView::addLandmark(Landmark *point)
         if(body->getActivedPart()->pointsSize() == 4)
            updateBodyPath();
         scene->addItem(point);
+        return;
     }
-
 
     float lineMin = 100000000;
     float indMin = 0;
@@ -57,14 +60,6 @@ void MarkupView::addLandmark(Landmark *point)
         int next = indPoint+1;
         if (next == body->getActivedPart()->points.size())
             next = 0;
-        float x1 = body->getActivedPart()->points[prev]->x();
-        float x2 = body->getActivedPart()->points[next]->x();
-        float y1 = body->getActivedPart()->points[prev]->y();
-        float y2 = body->getActivedPart()->points[next]->y();
-        float x = point->x();
-        float y = point->y();
-        bool amongX = ((x1 < x) && (x < x2)) || ((x1 > x) && (x > x2));
-        bool amongY = ((y1 > y) && (y >y2)) || ((y1 < y) && (y < y2));
 
         QPointF prevPoint = body->getActivedPart()->points[prev]->scenePos();
         QPointF nextPoint = body->getActivedPart()->points[next]->scenePos();
@@ -72,17 +67,9 @@ void MarkupView::addLandmark(Landmark *point)
         float line = sqrt((point->x()-centerLine.x())*(point->x()-centerLine.x()) + (point->y()-centerLine.y())*(point->y()-centerLine.y()));
         //(y1-y2)*x + (x2-x1)*y + (x1*y2-x2*y1);//distFromPoint2SegmentSq(point->scenePos(),body->getActivedPart()->points[prev]->scenePos(), body->getActivedPart()->points[next]->scenePos() );
 
-
         if (line < lineMin){
             lineMin = line;
             indMin = prev+1;
-        }
-
-        if (amongX && amongY){
-            body->getActivedPart()->addPoint(point, indPoint+1);
-            scene->addItem(point);
-            updateBodyPath();
-            return;
         }
     }
     body->getActivedPart()->addPoint(point, indMin);
@@ -159,6 +146,13 @@ void MarkupView::scaleOnSegment()
     qreal w = box.width()*(scaleSegmentParam+1);
     qreal h = box.height()*(scaleSegmentParam+1);
     fitInView (QRectF(x,y,w,h), Qt::KeepAspectRatio);
+}
+
+
+
+void MarkupView::setScaleSave(const bool &isSave)
+{
+    this->isScaleSave = isSave;
 }
 
 

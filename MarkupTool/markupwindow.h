@@ -41,12 +41,14 @@ private slots:
     void on_actionDelete_triggered();
     void on_actionDelete_triggered(bool checked);
     void on_actionUpdate_from_JSON_triggered();
-    void on_editButton_clicked(bool checked);
     void on_actionSave_shapeas_triggered();
     void on_listFiles_itemClicked(QListWidgetItem *item);
     void on_lineEdit_textChanged(const QString &arg1);
     void on_horizontalSlider_valueChanged(int value);
     void on_horizontalSlider_sliderMoved(int position);
+    void on_editCheak_stateChanged(int arg1);
+
+    void on_scaleCheak_stateChanged(int arg1);
 
 private:
     bool isContained(const int &ind, const int &size) const;

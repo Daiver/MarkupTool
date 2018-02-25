@@ -246,13 +246,6 @@ void MarkupWindow::on_actionUpdate_from_JSON_triggered()
 
 
 
-void MarkupWindow::on_editButton_clicked(bool checked)
-{
-    ui->markupView->setAllowEdit(checked);
-}
-
-
-
 void MarkupWindow::on_actionSave_shapeas_triggered()
 {
     QString fileName = QFileDialog::getSaveFileName(this, "Save shape", "/home/radiatus/Dataset/", "*.json");
@@ -290,4 +283,18 @@ void MarkupWindow::on_horizontalSlider_valueChanged(int value)
 void MarkupWindow::on_horizontalSlider_sliderMoved(int position)
 {
     ui->markupView->setScaleParam(position);
+}
+
+
+
+void MarkupWindow::on_editCheak_stateChanged(int arg1)
+{
+     ui->markupView->setAllowEdit(bool(arg1));
+}
+
+
+
+void MarkupWindow::on_scaleCheak_stateChanged(int arg1)
+{
+    ui->markupView->setScaleSave(bool(arg1));
 }

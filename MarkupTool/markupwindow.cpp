@@ -5,6 +5,7 @@ MarkupWindow::MarkupWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ma
 {
     ui->setupUi(this);
     images = new FilesPath();
+    shapes = new FilesPath();
 }
 
 
@@ -24,6 +25,8 @@ void MarkupWindow::on_loadFacesAction_triggered()
 
     QStringList imagesPaths = QFileDialog::getOpenFileNames(this, title, dir, format);
     images = new FilesPath(imagesPaths);
+    shapes = new FilesPath(imagesPaths);
+    shapes->setFormats("json");
     showImage(0);
 }
 
@@ -62,8 +65,7 @@ void MarkupWindow::saveShape() const
     if (indOpenedImage == -1)
         return;
 
-    FilePath imagePath = images->getFilePath(indOpenedImage);
-    QString path = imagePath.dir + imagePath.name + ".json";
+    QString path = shapes->getFilePath(indOpenedImage).fullName();
     saveShape(path);
 }
 
@@ -103,7 +105,7 @@ void MarkupWindow::updateListFiles(const QStringList &filesNames) const
 
     int indReady = 0;
     for (int indImg = 0; indImg < ui->listFiles->count(); indImg++){
-        QString path = images->getFilePath(indImg).dir + ui->listFiles->item(indImg)->text() + ".json";
+        QString path = shapes->getFilePath(indImg).dir + ui->listFiles->item(indImg)->text() + ".json";
 
         QFile file(path);
         if (!file.exists()){
@@ -140,7 +142,7 @@ void MarkupWindow::showImage(const int &indImage)
     reader.setAutoTransform(true);
     QImage image = reader.read();
     ui->markupView->drawImage(image);
-    QString pathShape = images->getFilePath(indImage).dir + images->getFilePath(indImage).name + ".json";
+    QString pathShape = shapes->getFilePath(indImage).fullName();
     loadShape(pathShape);
     updateListFiles(images->getNames());
 }
@@ -183,8 +185,6 @@ void MarkupWindow::on_comboBoxBodyPart_activated(int index)
 void MarkupWindow::on_actionClear_triggered()
 {
     ui->markupView->clearAllPart(indPart);
-    int ind = indPart;
-    int a =0;
 }
 
 
@@ -240,7 +240,7 @@ void MarkupWindow::on_actionUpdate_from_JSON_triggered()
     if (indOpenedImage == -1)
         return;
 
-    QString pathShape = images->getFilePath(indOpenedImage).dir + images->getFilePath(indOpenedImage).name + ".json";
+    QString pathShape = shapes->getFilePath(indOpenedImage).fullName();
     loadShape(pathShape);
 }
 
@@ -297,4 +297,42 @@ void MarkupWindow::on_editCheak_stateChanged(int arg1)
 void MarkupWindow::on_scaleCheak_stateChanged(int arg1)
 {
     ui->markupView->setScaleSave(bool(arg1));
+}
+
+
+
+void MarkupWindow::on_actionLoad_shapes_as_triggered()
+{
+    if (indOpenedImage == -1)
+        return;
+
+    QString title = "load shapes";
+    QString dir = "/home/radiatus/Dataset/";
+    QString format = "*.json";
+
+    QStringList shapesFiles = QFileDialog::getOpenFileNames(this, title, dir, format);
+
+    FilesPath shapesPath(shapesFiles);
+    for (int indShape = 0; indShape < shapesFiles.size(); indShape++)
+        for (int indNowShape = 0; indNowShape < shapes->size(); indNowShape++)
+            if (shapesPath.getFilePath(indShape).name == shapes->getFilePath(indNowShape).name){
+                QString path = shapesFiles[indShape];
+                shapes->filePath(indNowShape)->setPath(path);
+            }
+
+
+    //FilesPath *f = shapes;
+    showImage(indOpenedImage);
+}
+
+
+
+void MarkupWindow::on_actionLoad_shapes_triggered()
+{
+    if (indOpenedImage == -1)
+        return;
+
+    shapes = new FilesPath(images->getFullNames());
+    shapes->setFormats("json");
+    showImage(indOpenedImage);
 }

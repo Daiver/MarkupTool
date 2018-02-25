@@ -73,6 +73,25 @@ FilePath FilesPath::getFilePath(const int &indPath) const
 
 
 
+FilePath *FilesPath::filePath(const int &indPath)
+{
+    return &files[indPath];
+}
+
+
+
+QStringList FilesPath::getFullNames() const
+{
+    QStringList names;
+
+    for (int indPath = 0; indPath < size(); indPath++)
+        names.push_back(files[indPath].fullName());
+
+    return names;
+}
+
+
+
 QStringList FilesPath::getNames() const
 {
     QStringList names;
@@ -92,7 +111,31 @@ int FilesPath::size() const
 
 
 
+void FilesPath::setFormats(const QString &format)
+{
+    for (int indPath = 0; indPath < files.size(); indPath++)
+        files[indPath].setFormat(format);
+}
+
+
+
+void FilePath::setPath(const QString &path)
+{
+    dir = FilesPath::getDir(path);
+    format = FilesPath::getFormat(path);
+    name = FilesPath::getName(path);
+}
+
+
+
 QString FilePath::fullName() const
 {
     return dir + name + '.' + format;
+}
+
+
+
+void FilePath::setFormat(const QString &format)
+{
+    this->format = format;
 }

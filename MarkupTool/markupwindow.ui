@@ -169,6 +169,8 @@
      <string>Files</string>
     </property>
     <addaction name="loadFacesAction"/>
+    <addaction name="actionLoad_shapes"/>
+    <addaction name="actionLoad_shapes_as"/>
     <addaction name="actionUpdate_from_JSON"/>
     <addaction name="actionLoad_shape"/>
     <addaction name="actionSave_shape"/>
@@ -732,6 +734,16 @@
   <action name="actionSave_shapeas">
    <property name="text">
     <string>Save shape as..</string>
+   </property>
+  </action>
+  <action name="actionLoad_shapes_as">
+   <property name="text">
+    <string>Load shapes as..</string>
+   </property>
+  </action>
+  <action name="actionLoad_shapes">
+   <property name="text">
+    <string>Load shapes</string>
    </property>
   </action>
  </widget>

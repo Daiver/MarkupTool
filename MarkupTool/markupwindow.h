@@ -50,6 +50,10 @@ private slots:
 
     void on_scaleCheak_stateChanged(int arg1);
 
+    void on_actionLoad_shapes_as_triggered();
+
+    void on_actionLoad_shapes_triggered();
+
 private:
     bool isContained(const int &ind, const int &size) const;
     void loadShape(QString path);
@@ -59,6 +63,7 @@ private:
 private:
     Ui::MarkupWindow *ui = nullptr;
     FilesPath *images = nullptr;
+    FilesPath *shapes = nullptr;
     QStringList openedInList;
     int indOpenedImage = -1;
     int indPart = 0;

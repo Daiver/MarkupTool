@@ -11,7 +11,9 @@ struct FilePath
     QString format;
     QString dir;
 
+    void setPath(const QString &path);
     QString fullName() const;
+    void setFormat(const QString &format);
 };
 
 class FilesPath
@@ -26,8 +28,11 @@ public:
     static QVector<FilePath> getFilesPath(const QStringList &filesPath);
 
     FilePath getFilePath(const int &indPath) const;
+    FilePath* filePath(const int &indPath);
+    QStringList getFullNames() const;
     QStringList getNames() const;
     int size() const;
+    void setFormats(const QString &format);
 
 private:
     QVector<FilePath> files;

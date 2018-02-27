@@ -313,12 +313,16 @@ void MarkupWindow::on_actionLoad_shapes_as_triggered()
     QStringList shapesFiles = QFileDialog::getOpenFileNames(this, title, dir, format);
 
     FilesPath shapesPath(shapesFiles);
-    for (int indShape = 0; indShape < shapesFiles.size(); indShape++)
-        for (int indNowShape = 0; indNowShape < shapes->size(); indNowShape++)
-            if (shapesPath.getFilePath(indShape).name == shapes->getFilePath(indNowShape).name){
+    for (int indNowShape = 0; indNowShape < shapes->size(); indNowShape++)
+        for (int indShape = 0; indShape < shapesFiles.size(); indShape++){
+            if (shapes->getFilePath(indNowShape).name == shapesPath.getFilePath(indShape).name){
                 QString path = shapesFiles[indShape];
                 shapes->filePath(indNowShape)->setPath(path);
+                continue;
             }
+
+            shapes->filePath(indNowShape)->dir = shapesPath.getFilePath(indShape).dir;
+        }
 
 
     //FilesPath *f = shapes;

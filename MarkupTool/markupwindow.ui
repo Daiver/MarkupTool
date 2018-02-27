@@ -18,23 +18,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="7" column="1">
-     <widget class="QListWidget" name="listFiles">
-      <property name="maximumSize">
-       <size>
-        <width>120</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="textElideMode">
-       <enum>Qt::ElideLeft</enum>
-      </property>
-      <property name="currentRow">
-       <number>-1</number>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0" rowspan="8">
+    <item row="0" column="0" rowspan="11">
      <widget class="MarkupView" name="markupView">
       <property name="cursor" stdset="0">
        <cursorShape>ArrowCursor</cursorShape>
@@ -85,7 +69,7 @@
       </item>
      </widget>
     </item>
-    <item row="5" column="1">
+    <item row="8" column="1">
      <widget class="QLabel" name="ready">
       <property name="text">
        <string>Ready: </string>
@@ -101,7 +85,7 @@
       </property>
      </widget>
     </item>
-    <item row="6" column="1">
+    <item row="9" column="1">
      <widget class="QLineEdit" name="lineEdit">
       <property name="maximumSize">
        <size>
@@ -111,7 +95,7 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
+    <item row="3" column="1">
      <widget class="QSlider" name="horizontalSlider">
       <property name="maximumSize">
        <size>
@@ -130,7 +114,7 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
+    <item row="6" column="1">
      <widget class="QCheckBox" name="scaleCheak">
       <property name="text">
        <string>Save scale</string>
@@ -140,13 +124,59 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="1">
+    <item row="5" column="1">
+     <widget class="QSlider" name="horizontalSlider_2">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="singleStep">
+       <number>10</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
      <widget class="QCheckBox" name="editCheak">
       <property name="text">
        <string>Allow edit</string>
       </property>
       <property name="checked">
        <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="1">
+     <widget class="QListWidget" name="listFiles">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="textElideMode">
+       <enum>Qt::ElideLeft</enum>
+      </property>
+      <property name="currentRow">
+       <number>-1</number>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="label">
+      <property name="text">
+       <string>Contrast</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="label_2">
+      <property name="text">
+       <string>Scale on segment</string>
       </property>
      </widget>
     </item>

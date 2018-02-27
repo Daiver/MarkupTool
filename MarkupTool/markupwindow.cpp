@@ -382,3 +382,18 @@ void MarkupWindow::on_actionHelp_triggered()
     msgBox.setText(mes);
     msgBox.exec();
 }
+
+
+
+void MarkupWindow::on_sharpBox_toggled(bool checked)
+{
+
+}
+
+
+
+void MarkupWindow::on_horizontalSlider_2_valueChanged(int value)
+{
+    ui->markupView->setContrast(value);
+    showImage(indOpenedImage);
+}

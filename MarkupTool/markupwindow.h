@@ -9,7 +9,6 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QClipboard>
-
 #include "filespath.h"
 #include "loaderjsonbody.h"
 
@@ -56,6 +55,10 @@ private slots:
     void on_actionLoad_shapes_triggered();
 
     void on_actionHelp_triggered();
+
+    void on_sharpBox_toggled(bool checked);
+
+    void on_horizontalSlider_2_valueChanged(int value);
 
 private:
     bool isContained(const int &ind, const int &size) const;

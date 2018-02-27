@@ -102,8 +102,8 @@ void Landmark::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     if (start || up){
-        pen.setColor(Qt::red);
-        brush.setColor(Qt::red);
+        pen.setColor(Qt::green);
+        brush.setColor(Qt::green);
     }
 
     QRectF rect = this->boundingRect();

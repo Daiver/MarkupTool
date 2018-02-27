@@ -13,7 +13,10 @@ void MarkupView::drawImage(const QImage &image)
 {
     clearAll();
     scene->clear();
-    QPixmap pixmap = QPixmap::fromImage(image);
+    QImage imageLoc = image;
+    if (contrastImage)
+        contrast(imageLoc);
+    QPixmap pixmap = QPixmap::fromImage(imageLoc);
     this->image = new QGraphicsPixmapItem(pixmap);
     scene->addItem(this->image);
 
@@ -130,6 +133,13 @@ void MarkupView::setBody(Body newBody)
 
 
 
+void MarkupView::setContrast(int value)
+{
+    this->contrastImage = value;
+}
+
+
+
 void MarkupView::setScaleParam(const int &param)
 {
     scaleSegmentParam = param/10.0;
@@ -149,6 +159,53 @@ void MarkupView::scaleOnSegment()
     qreal w = box.width()*(scaleSegmentParam+1);
     qreal h = box.height()*(scaleSegmentParam+1);
     fitInView (QRectF(x,y,w,h), Qt::KeepAspectRatio);
+}
+
+
+
+void MarkupView::contrast(QImage &image)
+{
+    int filter_a [9]= { -1,-1,-1,
+                        -1,9,-1,
+                       -1,-1,-1};
+         int sum = 1;
+         int r,g,b;
+         QColor color;
+         QImage image_new(image.width(),image.height(),QImage::Format_RGB32);
+
+         for(int x = 1; x < image.height()-1; x++){
+               for(int y = 1; y<image.width()-1; y++){
+
+                   r = 0;
+                   g = 0;
+                   b = 0;
+                    /*
+                   for(int i = 0; i <= 2; i++){
+                       for(int j = 0; j <= 2; j++){
+                           color = QColor(image.pixel(y+i-1,x+j-1));
+                           r += color.red()*(filter_a[(j*3+i)]);
+                           g += color.green()*(filter_a[(j*3+i)]);
+                           b += color.blue()*(filter_a[(j*3+i)]);
+                       }
+                   }*/
+                    color = QColor(image.pixel(y-1,x-1));
+                   r = color.red();//qBound(0, r/sum, 255);
+                   g = color.green();//qBound(0, g/sum, 255);
+                   b = color.blue();//qBound(0, b/sum, 255);
+
+                   int contrast = (int)((100.000 / 100) * contrastImage);
+
+                   int R3 = contrast < 0 ? (r * (100 - contrast) + 128 * contrast) / 100 : (r * 100 - 128 * contrast) / (101 - contrast);
+                   int R4 = R3 < 0 ? R4 = 0 : R3 > 255 ? R4 = 255 : R3;
+                   int G3 = contrast < 0 ? (g * (100 - contrast) + 128 * contrast) / 100 : (g * 100 - 128 * contrast) / (101 - contrast);
+                   int G4 = G3 < 0 ? G4 = 0 : G3 > 255 ? G4 = 255 : G3;
+                   int B3 = contrast < 0 ? (b * (100 - contrast) + 128 * contrast) / 100 : (b * 100 - 128 * contrast) / (101 - contrast);
+                   int B4 = B3 < 0 ? B4 = 0 : B3 > 255 ? B4 = 255 : B3;
+
+                   image_new.setPixel(y,x, qRgb(R4,G4,B4));
+         }
+     }
+ image = image_new;
 }
 
 
@@ -333,7 +390,7 @@ void MarkupView::updateBodyPath()
     QPainterPath pathUp = Spline::build(QPolygonF(pointsUp));
 
     body->getActivedPart()->pathUp = new QGraphicsPathItem(pathUp);
-    QPen penUp(Qt::red);
+    QPen penUp(Qt::green);
     penUp.setWidth(0.1);
     body->getActivedPart()->pathUp->setPen(penUp);
     scene->addItem(body->getActivedPart()->pathUp);

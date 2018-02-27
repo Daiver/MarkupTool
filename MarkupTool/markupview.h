@@ -7,6 +7,7 @@
 #include <QGraphicsScene>
 #include <QWheelEvent>
 #include <QScrollBar>
+#include <QGraphicsBlurEffect>
 
 #include "body.h"
 #include "spline.h"
@@ -17,7 +18,7 @@ class MarkupView : public QGraphicsView
 public:
     explicit MarkupView(QWidget *parent = 0);
 
-    Landmark* createLandmark(qreal x, qreal y, qreal w, qreal h, int ind = 0, QPen pen = QPen(Qt::red), QBrush brush = QBrush(Qt::red));
+    Landmark* createLandmark(qreal x, qreal y, qreal w, qreal h, int ind = 0, QPen pen = QPen(Qt::green), QBrush brush = QBrush(Qt::green));
     Body* getBody();
     void drawImage(const QImage &image);
     bool clickOnLandmark(const QPointF &point, const float &radius) const;
@@ -27,6 +28,8 @@ public:
     void setBody(Body newBody);
     void setScaleParam(const int &param);
     void scaleOnSegment();
+    void setContrast(int value);
+    void contrast(QImage &image);
     void setScaleSave(const bool &isSave);
     QGraphicsScene* getScene();
 
@@ -61,6 +64,7 @@ public slots:
 private:
     QGraphicsScene *scene = nullptr;
     QGraphicsItem *image = nullptr;
+    int contrastImage = 0;
     bool deleteOption = false;
     bool allowEdit = true;
     bool isScaleSave = true;

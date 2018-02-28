@@ -182,6 +182,13 @@ void MarkupView::scaleOnSegment()
 
 
 
+int MarkupView::getContrast() const
+{
+    return contrastImage;
+}
+
+
+
 void MarkupView::contrast(QImage &image)
 {
     int filter_a [9]= { -1,-1,-1,

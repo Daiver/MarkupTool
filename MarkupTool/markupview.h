@@ -29,6 +29,7 @@ public:
     void updateImage(QImage &image);
     void setScaleParam(const int &param);
     void scaleOnSegment();
+    int getContrast() const;
     void setContrast(int value);
     void contrast(QImage &image);
     void setScaleSave(const bool &isSave);

@@ -414,6 +414,8 @@ void MarkupWindow::on_sharpBox_toggled(bool checked)
 
 void MarkupWindow::on_horizontalSlider_2_valueChanged(int value)
 {
+    if (value == ui->markupView->getContrast())
+        return;
     ui->markupView->setContrast(value);
     updateImage();
 }

@@ -14,8 +14,7 @@ void MarkupView::drawImage(const QImage &image)
     clearAll();
     scene->clear();
     QImage imageLoc = image;
-    if (contrastImage)
-        contrast(imageLoc);
+    contrast(imageLoc);
     QPixmap pixmap = QPixmap::fromImage(imageLoc);
     this->image = new QGraphicsPixmapItem(pixmap);
     scene->addItem(this->image);
@@ -133,6 +132,26 @@ void MarkupView::setBody(Body newBody)
 
 
 
+void MarkupView::updateImage(QImage &image)
+{
+    scene->removeItem(this->image);
+    QImage imageLoc = image;
+    contrast(imageLoc);
+    QPixmap pixmap = QPixmap::fromImage(imageLoc);
+    this->image = new QGraphicsPixmapItem(pixmap);
+    this->image->setZValue(-100);
+    scene->addItem(this->image);
+
+    if (isScaleSave == true)
+        return;
+
+    updateBodyPoints();
+    updateBodyPath();
+    fitInView (this->image, Qt::KeepAspectRatio); // положение прим смене лица нарушится
+}
+
+
+
 void MarkupView::setContrast(int value)
 {
     this->contrastImage = value;
@@ -173,12 +192,8 @@ void MarkupView::contrast(QImage &image)
          QColor color;
          QImage image_new(image.width(),image.height(),QImage::Format_RGB32);
 
-         for(int x = 1; x < image.height()-1; x++){
-               for(int y = 1; y<image.width()-1; y++){
-
-                   r = 0;
-                   g = 0;
-                   b = 0;
+         for(int x = 0; x < image.height(); x++){
+               for(int y = 0; y<image.width(); y++){
                     /*
                    for(int i = 0; i <= 2; i++){
                        for(int j = 0; j <= 2; j++){
@@ -188,7 +203,7 @@ void MarkupView::contrast(QImage &image)
                            b += color.blue()*(filter_a[(j*3+i)]);
                        }
                    }*/
-                    color = QColor(image.pixel(y-1,x-1));
+                   color = QColor(image.pixel(y,x));
                    r = color.red();//qBound(0, r/sum, 255);
                    g = color.green();//qBound(0, g/sum, 255);
                    b = color.blue();//qBound(0, b/sum, 255);

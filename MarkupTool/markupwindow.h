@@ -27,7 +27,7 @@ public:
 public:
     void updateListFiles(const QStringList &filesNames) const;
     void showImage(const int &indImage);
-
+    void updateImage();
 private slots:
     void on_loadFacesAction_triggered();
     void on_actionNext_triggered();

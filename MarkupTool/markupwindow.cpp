@@ -149,6 +149,22 @@ void MarkupWindow::showImage(const int &indImage)
 
 
 
+void MarkupWindow::updateImage()
+{
+    bool isCont = isContained(indOpenedImage, images->size());
+    if (!isCont)
+        return;
+
+    QString path = images->getFilePath(indOpenedImage).fullName();
+    QImageReader reader(path);
+    reader.setAutoTransform(true);
+    QImage image = reader.read();
+    ui->markupView->updateImage(image);
+    updateListFiles(images->getNames());
+}
+
+
+
 void MarkupWindow::on_actionNext_triggered()
 {
     saveShape();
@@ -399,5 +415,5 @@ void MarkupWindow::on_sharpBox_toggled(bool checked)
 void MarkupWindow::on_horizontalSlider_2_valueChanged(int value)
 {
     ui->markupView->setContrast(value);
-    showImage(indOpenedImage);
+    updateImage();
 }

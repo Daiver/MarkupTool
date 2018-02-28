@@ -26,6 +26,7 @@ public:
     void changeSizeLandmark(const double &size);
     void changeBodyPart(int indBlock);
     void setBody(Body newBody);
+    void updateImage(QImage &image);
     void setScaleParam(const int &param);
     void scaleOnSegment();
     void setContrast(int value);

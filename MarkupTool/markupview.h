@@ -32,12 +32,13 @@ public:
     int getContrast() const;
     void setContrast(int value);
     void contrast(QImage &image);
+    float getDistance(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
     void setScaleSave(const bool &isSave);
     QGraphicsScene* getScene();
 
     double point2SegmentProjectionParameter(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
     QPointF projectPoint2Segment(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
-    double distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
+    double distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2);
 
     void centralOnSegment();
     void setAllowEdit(bool allow);

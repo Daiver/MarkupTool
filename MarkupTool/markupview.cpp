@@ -1,4 +1,5 @@
 #include "markupview.h"
+#include "math.h"
 
 MarkupView::MarkupView(QWidget *parent) : QGraphicsView(parent)
 {
@@ -39,7 +40,15 @@ bool MarkupView::clickOnLandmark(const QPointF &point, const float &radius) cons
     return false;
 }
 
+QVector2D normalize(QVector2D &v) {
+  float N = sqrt(v.x()*v.x()+v.y()*v.y());
+  Q_ASSERT(N > 0);
+  return QVector2D(v.x()/N,v.y()/N);
+}
 
+float scaleMultiply(QVector2D a,QVector2D b) {
+  return a.x()*b.x()+a.y()*b.y();
+}
 
 void MarkupView::addLandmark(Landmark *point)
 {
@@ -65,10 +74,8 @@ void MarkupView::addLandmark(Landmark *point)
 
         QPointF prevPoint = body->getActivedPart()->points[prev]->scenePos();
         QPointF nextPoint = body->getActivedPart()->points[next]->scenePos();
-        QPointF centerLine = (nextPoint+prevPoint)/2.0;
-        float line = sqrt((point->x()-centerLine.x())*(point->x()-centerLine.x()) + (point->y()-centerLine.y())*(point->y()-centerLine.y()));
-        //(y1-y2)*x + (x2-x1)*y + (x1*y2-x2*y1);//distFromPoint2SegmentSq(point->scenePos(),body->getActivedPart()->points[prev]->scenePos(), body->getActivedPart()->points[next]->scenePos() );
 
+        float line = getDistance(point->scenePos(), prevPoint, nextPoint);
         if (line < lineMin){
             lineMin = line;
             indMin = prev+1;
@@ -227,7 +234,27 @@ void MarkupView::contrast(QImage &image)
                    image_new.setPixel(y,x, qRgb(R4,G4,B4));
          }
      }
- image = image_new;
+         image = image_new;
+}
+
+
+
+float MarkupView::getDistance(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+{
+    QVector2D lineV(p2 - p1);
+    QVector2D pt(point - p1);
+    QVector2D project = QVector2D::dotProduct(pt,lineV)*lineV/QVector2D::dotProduct(lineV,lineV);//lineV*(QVector2D::dotProduct(lineV, pt)/QVector2D::dotProduct(lineV, lineV));
+    QVector2D d = project+QVector2D(p1);
+    if (d.x() < p1.x() && p1.x() < p2.x())
+        d = QVector2D(p1);
+    if (d.x() > p2.x() && p1.x() < p2.x())
+        d = QVector2D(p2);
+    if (d.x() > p1.x() && p1.x() > p2.x())
+        d = QVector2D(p1);
+    if (d.x() < p2.x() && p1.x() > p2.x())
+        d = QVector2D(p2);
+    float line = sqrt((point.x()-d.x())*(point.x()-d.x()) + (point.y()-d.y())*(point.y()-d.y()));//sqrt(QVector2D::dotProduct(QVector2D(point.scenePos()),d));
+    return line;
 }
 
 
@@ -248,9 +275,9 @@ QGraphicsScene *MarkupView::getScene()
 
 double MarkupView::point2SegmentProjectionParameter(const QPointF &point, const QPointF &p1, const QPointF &p2) const
 {
-    double l2 = sqrt((p1.x()-p2.x())*(p1.x()-p2.x()) + (p1.y()-p2.y())*(p1.y()-p2.y()));
+    double l2 = sqrt((p2.x()-p1.x())*(p2.x()-p1.x()) + (p2.y()-p1.y())*(p2.y()-p1.y()));
     double product = QVector2D::dotProduct(QVector2D(point-p1), QVector2D(p2 - p1)) / l2;
-    return qMax(0.0, qMin(1.0, product));
+    return qMin(qMax(product,0.0),1.0);
 }
 
 
@@ -263,7 +290,7 @@ QPointF MarkupView::projectPoint2Segment(const QPointF &point, const QPointF &p1
 
 
 
-double MarkupView::distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+double MarkupView::distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2)
 {
     QPointF projection = projectPoint2Segment(point, p1, p2);
     return sqrt((projection.x()-point.x())*(projection.x()-point.x()) + (projection.y()-point.y())*(projection.y()-point.y())); //(point, projection);

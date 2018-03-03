@@ -1,4 +1,4 @@
-#include "markupwindow.h"
+    #include "markupwindow.h"
 #include "ui_markupwindow.h"
 
 MarkupWindow::MarkupWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MarkupWindow)
@@ -20,7 +20,7 @@ MarkupWindow::~MarkupWindow()
 void MarkupWindow::on_loadFacesAction_triggered()
 {
     QString title = "load images";
-    QString dir = "/home/radiatus/Dataset/";
+    QString dir = "/home/radiatus/Dataset/OutSource/Helen/";
     QString format = "Images (*.png *.jpg)";
 
     QStringList imagesPaths = QFileDialog::getOpenFileNames(this, title, dir, format);
@@ -417,5 +417,22 @@ void MarkupWindow::on_horizontalSlider_2_valueChanged(int value)
     if (value == ui->markupView->getContrast())
         return;
     ui->markupView->setContrast(value);
+    updateImage();
+}
+
+
+
+void MarkupWindow::on_cheakEmpty_toggled(bool checked)
+{
+
+}
+
+
+
+void MarkupWindow::on_horizontalSlider_3_valueChanged(int value)
+{
+    if (value == ui->markupView->getBright())
+        return;
+    ui->markupView->setBright(value);
     updateImage();
 }

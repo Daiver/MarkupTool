@@ -47,18 +47,15 @@ private slots:
     void on_horizontalSlider_valueChanged(int value);
     void on_horizontalSlider_sliderMoved(int position);
     void on_editCheak_stateChanged(int arg1);
-
     void on_scaleCheak_stateChanged(int arg1);
-
     void on_actionLoad_shapes_as_triggered();
-
     void on_actionLoad_shapes_triggered();
-
     void on_actionHelp_triggered();
-
     void on_sharpBox_toggled(bool checked);
-
     void on_horizontalSlider_2_valueChanged(int value);
+    void on_cheakEmpty_toggled(bool checked);
+
+    void on_horizontalSlider_3_valueChanged(int value);
 
 private:
     bool isContained(const int &ind, const int &size) const;
@@ -71,6 +68,7 @@ private:
     FilesPath *images = nullptr;
     FilesPath *shapes = nullptr;
     QStringList openedInList;
+    bool onlyEmpty = false;
     int indOpenedImage = -1;
     int indPart = 0;
 };

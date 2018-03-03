@@ -31,7 +31,10 @@ public:
     void scaleOnSegment();
     int getContrast() const;
     void setContrast(int value);
+    int getBright() const;
+    void setBright(int value);
     void contrast(QImage &image);
+    void bright(QImage &image);
     float getDistance(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
     void setScaleSave(const bool &isSave);
     QGraphicsScene* getScene();
@@ -68,6 +71,7 @@ private:
     QGraphicsScene *scene = nullptr;
     QGraphicsItem *image = nullptr;
     int contrastImage = 0;
+    int brightImage = 0;
     bool deleteOption = false;
     bool allowEdit = true;
     bool isScaleSave = true;

@@ -15,6 +15,7 @@ void MarkupView::drawImage(const QImage &image)
     clearAll();
     scene->clear();
     QImage imageLoc = image;
+    bright(imageLoc);
     contrast(imageLoc);
     QPixmap pixmap = QPixmap::fromImage(imageLoc);
     this->image = new QGraphicsPixmapItem(pixmap);
@@ -143,6 +144,7 @@ void MarkupView::updateImage(QImage &image)
 {
     scene->removeItem(this->image);
     QImage imageLoc = image;
+    bright(imageLoc);
     contrast(imageLoc);
     QPixmap pixmap = QPixmap::fromImage(imageLoc);
     this->image = new QGraphicsPixmapItem(pixmap);
@@ -162,6 +164,20 @@ void MarkupView::updateImage(QImage &image)
 void MarkupView::setContrast(int value)
 {
     this->contrastImage = value;
+}
+
+
+
+int MarkupView::getBright() const
+{
+    return brightImage;
+}
+
+
+
+void MarkupView::setBright(int value)
+{
+    this->brightImage = value;
 }
 
 
@@ -235,6 +251,43 @@ void MarkupView::contrast(QImage &image)
          }
      }
          image = image_new;
+}
+
+
+
+void MarkupView::bright(QImage &image)
+{
+    int r,g,b;
+    QColor color;
+    QImage image_new(image.width(),image.height(),QImage::Format_RGB32);
+
+    for(int x = 0; x < image.height(); x++){
+          for(int y = 0; y<image.width(); y++){
+               /*
+              for(int i = 0; i <= 2; i++){
+                  for(int j = 0; j <= 2; j++){
+                      color = QColor(image.pixel(y+i-1,x+j-1));
+                      r += color.red()*(filter_a[(j*3+i)]);
+                      g += color.green()*(filter_a[(j*3+i)]);
+                      b += color.blue()*(filter_a[(j*3+i)]);
+                  }
+              }*/
+              color = QColor(image.pixel(y,x));
+              r = color.red();//qBound(0, r/sum, 255);
+              g = color.green();//qBound(0, g/sum, 255);
+              b = color.blue();//qBound(0, b/sum, 255);
+
+              int bright = (int)((100.000 / 100) * brightImage);
+
+
+              int R2 = r + bright * 128 / 100 <= 0 ? 0 : r + bright * 128 / 100 >= 255 ? 255 : r + bright * 128 / 100;
+              int G2 = g + bright * 128 / 100 <= 0 ? 0 : g + bright * 128 / 100 >= 255 ? 255 : g + bright * 128 / 100;
+                int B2 = b + bright * 128 / 100 <= 0 ? 0 : b + bright * 128 / 100 >= 255 ? 255 : b + bright * 128 / 100;
+
+              image_new.setPixel(y,x, qRgb(R2,G2,B2));
+    }
+}
+    image = image_new;
 }
 
 

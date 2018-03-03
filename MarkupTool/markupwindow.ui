@@ -18,7 +18,7 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" rowspan="11">
+    <item row="0" column="0" rowspan="13">
      <widget class="MarkupView" name="markupView">
       <property name="cursor" stdset="0">
        <cursorShape>ArrowCursor</cursorShape>
@@ -34,6 +34,13 @@
       </property>
       <property name="viewportUpdateMode">
        <enum>QGraphicsView::FullViewportUpdate</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>Bright</string>
       </property>
      </widget>
     </item>
@@ -69,7 +76,7 @@
       </item>
      </widget>
     </item>
-    <item row="8" column="1">
+    <item row="10" column="1">
      <widget class="QLabel" name="ready">
       <property name="text">
        <string>Ready: </string>
@@ -85,7 +92,7 @@
       </property>
      </widget>
     </item>
-    <item row="9" column="1">
+    <item row="11" column="1">
      <widget class="QLineEdit" name="lineEdit">
       <property name="maximumSize">
        <size>
@@ -114,7 +121,7 @@
       </property>
      </widget>
     </item>
-    <item row="6" column="1">
+    <item row="8" column="1">
      <widget class="QCheckBox" name="scaleCheak">
       <property name="text">
        <string>Save scale</string>
@@ -140,7 +147,7 @@
       </property>
      </widget>
     </item>
-    <item row="7" column="1">
+    <item row="9" column="1">
      <widget class="QCheckBox" name="editCheak">
       <property name="text">
        <string>Allow edit</string>
@@ -150,7 +157,7 @@
       </property>
      </widget>
     </item>
-    <item row="10" column="1">
+    <item row="12" column="1">
      <widget class="QListWidget" name="listFiles">
       <property name="maximumSize">
        <size>
@@ -177,6 +184,19 @@
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>Scale on segment</string>
+      </property>
+     </widget>
+    </item>
+    <item row="7" column="1">
+     <widget class="QSlider" name="horizontalSlider_3">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </item>

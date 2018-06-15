@@ -14,25 +14,26 @@ void MarkupView::drawImage(const QImage &image)
 {
     clearAll();
     scene->clear();
+
     QImage imageLoc = image;
     bright(imageLoc);
     contrast(imageLoc);
     QPixmap pixmap = QPixmap::fromImage(imageLoc);
-    this->image = new QGraphicsPixmapItem(pixmap);
-    scene->addItem(this->image);
+    this->imageItem = new QGraphicsPixmapItem(pixmap);
+    scene->addItem(this->imageItem);
 
-    if (isScaleSave == true)
+    if (scaleSaveOption == true)
         return;
 
-    fitInView (this->image, Qt::KeepAspectRatio); // положение прим смене лица нарушится
+    fitInView (this->imageItem, Qt::KeepAspectRatio); // положение прим смене лица нарушится
 }
 
 
 
 bool MarkupView::clickOnLandmark(const QPointF &point, const float &radius) const
 {
-    for (int indPoint = 0; indPoint < body->getActivedPart()->points.size(); indPoint++){
-        QPointF landmark = body->getActivedPart()->points[indPoint]->scenePos();
+    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->points.size(); indPoint++){
+        QPointF landmark = faceShape->getActivedPart()->points[indPoint]->scenePos();
         bool amongX = (point.x() < landmark.x()+radius) && (point.x() > landmark.x()-radius);
         bool amongY = (point.y() < landmark.y()+radius) && (point.y() > landmark.y()-radius);
         if (amongX && amongY)
@@ -41,25 +42,18 @@ bool MarkupView::clickOnLandmark(const QPointF &point, const float &radius) cons
     return false;
 }
 
-QVector2D normalize(QVector2D &v) {
-  float N = sqrt(v.x()*v.x()+v.y()*v.y());
-  Q_ASSERT(N > 0);
-  return QVector2D(v.x()/N,v.y()/N);
-}
 
-float scaleMultiply(QVector2D a,QVector2D b) {
-  return a.x()*b.x()+a.y()*b.y();
-}
 
-void MarkupView::addLandmark(Landmark *point)
+void MarkupView::addLandmark(Landmark *point, bool updatePath)
 {
-    if (body->getActivedPart()->pointsSize() < 4){
+
+    if (faceShape->getActivedPart()->pointsSize() < 4){
         int ind = 0;
-        for (int indPoint = 0; indPoint < body->getActivedPart()->pointsSize(); indPoint++)
+        for (int indPoint = 0; indPoint < faceShape->getActivedPart()->pointsSize(); indPoint++)
             ind++;
-        body->getActivedPart()->addPoint(point, ind);
-        if(body->getActivedPart()->pointsSize() == 4)
-           updateBodyPath();
+        faceShape->getActivedPart()->addPoint(point, ind);
+        if(faceShape->getActivedPart()->pointsSize() == 4 && updatePath)
+            updateSegmentPath();
         scene->addItem(point);
         return;
     }
@@ -67,14 +61,14 @@ void MarkupView::addLandmark(Landmark *point)
     float lineMin = 100000000;
     float indMin = 0;
 
-    for (int indPoint = 0; indPoint < body->getActivedPart()->points.size(); indPoint++){
+    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->points.size(); indPoint++){
         int prev = indPoint;
         int next = indPoint+1;
-        if (next == body->getActivedPart()->points.size())
+        if (next == faceShape->getActivedPart()->points.size())
             next = 0;
 
-        QPointF prevPoint = body->getActivedPart()->points[prev]->scenePos();
-        QPointF nextPoint = body->getActivedPart()->points[next]->scenePos();
+        QPointF prevPoint = faceShape->getActivedPart()->points[prev]->scenePos();
+        QPointF nextPoint = faceShape->getActivedPart()->points[next]->scenePos();
 
         float line = getDistance(point->scenePos(), prevPoint, nextPoint);
         if (line < lineMin){
@@ -82,109 +76,152 @@ void MarkupView::addLandmark(Landmark *point)
             indMin = prev+1;
         }
     }
-    body->getActivedPart()->addPoint(point, indMin);
-    updateBodyPath();
+    faceShape->getActivedPart()->addPoint(point, indMin);
+    if (updatePath)
+        updateSegmentPath();
     scene->addItem(point);
 }
 
 
 
-void MarkupView::changeBodyPart(int indPart)
+void MarkupView::changeSegment(const int &indSegment)
 {
-    clearScene(body->indActived);
-    body->indActived = indPart;
+    clearScene(faceShape->indActived);
+    faceShape->indActived = indSegment;
+
     scaleOnSegment();
-    updateBodyPoints();
-    updateBodyPath();
+    updateSegmentPoints();
+    updateSegmentPath();
 }
 
 
 
-void MarkupView::setBody(Body newBody)
+void MarkupView::setFaceShape(ShapeFace newFaceShape)
 {
-    int indActived = body->indActived;
-    clearScene(body->indActived);
-    body = new Body();
-    body->indActived = indActived;
+    int indActived = faceShape->indActived;
+    clearScene(faceShape->indActived);
+    faceShape = new ShapeFace();
+    faceShape->indActived = indActived;
 
-    for (int indPart = 0; indPart < newBody.parts.size(); indPart++){
-        int indPoint = 0;
-        if (newBody.parts[indPart].corner.size() == 0)
+    for (int indPart = 0; indPart < newFaceShape.parts.size(); indPart++){
+        Segment part = newFaceShape.parts[indPart];
+        faceShape->indActived = indPart;
+        faceShape->getActivedPart()->indInvisibleSegment = 0;
+        if (part.corner.size() == 0)
             continue;
-        Landmark *landmark = createLandmark(newBody.parts[indPart].corner[indPoint].x(), newBody.parts[indPart].corner[indPoint].y(), sizeLandmark, sizeLandmark, indPoint);
-        landmark->setStart(true);
-        body->parts[indPart].loadPoint(landmark, indPoint);
 
-        for (int indPointUp = 0; indPointUp < newBody.parts[indPart].up.size(); indPointUp++){
-            indPoint++;
-            Landmark *landmark = createLandmark(newBody.parts[indPart].up[indPointUp].x(), newBody.parts[indPart].up[indPointUp].y(), sizeLandmark, sizeLandmark, indPoint);
-            body->parts[indPart].loadPoint(landmark, indPoint);
+        Landmark *cornerLeft = createLandmark(part.corner[0].x(), part.corner[0].y(), sizePointsValue, sizePointsValue, indPart);
+        Landmark *centralUp = createLandmark(part.centers[0].x(), part.centers[0].y(), sizePointsValue, sizePointsValue, indPart);
+        Landmark *cornerRight = createLandmark(part.corner[1].x(), part.corner[1].y(), sizePointsValue, sizePointsValue, indPart);
+        Landmark *centralDown = createLandmark(part.centers[1].x(), part.centers[1].y(), sizePointsValue, sizePointsValue, indPart);
+
+        faceShape->parts[indPart].invisibleSegments = part.invisibleSegments;
+        addLandmark(cornerLeft, false);
+        addLandmark(centralUp, false);
+        addLandmark(cornerRight, false);
+        addLandmark(centralDown, false);
+
+        for (int indPoint = 0; indPoint < part.up.size(); indPoint++){
+            if (faceShape->parts[indPart].up.contains(part.up[indPoint]))
+                continue;
+            Landmark *landmark = createLandmark(part.up[indPoint].x(), part.up[indPoint].y(), sizePointsValue, sizePointsValue);
+            addLandmark(landmark, false);
         }
 
-        indPoint++;
-        Landmark *landmark2 = createLandmark(newBody.parts[indPart].corner[1].x(), newBody.parts[indPart].corner[1].y(), sizeLandmark, sizeLandmark, indPoint);
-        landmark2->setEnd(true);
-        body->parts[indPart].loadPoint(landmark2, indPoint);
-
-        for (int indPointDown = 0; indPointDown < newBody.parts[indPart].down.size(); indPointDown++){
-            indPoint++;
-            Landmark *landmark = createLandmark(newBody.parts[indPart].down[indPointDown].x(), newBody.parts[indPart].down[indPointDown].y(), sizeLandmark, sizeLandmark, indPoint);
-            body->parts[indPart].loadPoint(landmark, indPoint);
+        for (int indPoint = 0; indPoint < part.down.size(); indPoint++){
+            if (faceShape->parts[indPart].down.contains(part.down[indPoint]))
+                continue;
+            Landmark *landmark = createLandmark(part.down[indPoint].x(), part.down[indPoint].y(), sizePointsValue, sizePointsValue);
+            addLandmark(landmark, false);
         }
     }
 
-    updateBodyPoints();
-    updateBodyPath();
+    for (int indPart = 0; indPart < faceShape->parts.size(); indPart++)
+        for (int indInvSeg = 0; indInvSeg < newFaceShape.parts[indPart].invisibleSegments.size(); indInvSeg++)
+            for (int ind = 0; ind < newFaceShape.parts[indPart].invisibleSegments[indInvSeg].size(); ind++)
+                faceShape->parts[indPart].points[newFaceShape.parts[indPart].invisibleSegments[indInvSeg].at(ind)]->setInvsibile(true);
+
+
+    faceShape->indActived = indActived;
+    updateSegmentPoints();
+    updateSegmentPath();
     scaleOnSegment();
 }
 
 
 
-void MarkupView::updateImage(QImage &image)
+void MarkupView::updateImage(const QImage &image)
 {
-    scene->removeItem(this->image);
+    scene->removeItem(this->imageItem);
     QImage imageLoc = image;
     bright(imageLoc);
     contrast(imageLoc);
     QPixmap pixmap = QPixmap::fromImage(imageLoc);
-    this->image = new QGraphicsPixmapItem(pixmap);
-    this->image->setZValue(-100);
-    scene->addItem(this->image);
+    this->imageItem = new QGraphicsPixmapItem(pixmap);
+    this->imageItem->setZValue(-100);
+    scene->addItem(this->imageItem);
 
-    if (isScaleSave == true)
+    if (scaleSaveOption == true)
         return;
 
-    updateBodyPoints();
-    updateBodyPath();
-    fitInView (this->image, Qt::KeepAspectRatio); // положение прим смене лица нарушится
+    updateSegmentPoints();
+    updateSegmentPath();
+    fitInView (this->imageItem, Qt::KeepAspectRatio); // положение прим смене лица нарушится
 }
 
 
 
-void MarkupView::setContrast(int value)
+void MarkupView::setContrast(const int &value)
 {
-    this->contrastImage = value;
+    this->contrastValue = value;
 }
 
 
 
 int MarkupView::getBright() const
 {
-    return brightImage;
+    return brightValue;
 }
 
 
 
-void MarkupView::setBright(int value)
+void MarkupView::setInvisibleSegmentPoint(const QPointF &point)
 {
-    this->brightImage = value;
+    clearScene(faceShape->indActived);
+    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->points.size(); indPoint++){
+        QPointF landmark = faceShape->getActivedPart()->points[indPoint]->scenePos();
+        bool amongX = (point.x() < landmark.x()+sizePointsValue*5) && (point.x() > landmark.x()-sizePointsValue*5);
+        bool amongY = (point.y() < landmark.y()+sizePointsValue*5) && (point.y() > landmark.y()-sizePointsValue*5);
+        if (amongX && amongY){
+            if (faceShape->getActivedPart()->points[indPoint]->isInvisble() == true)
+                faceShape->getActivedPart()->setInvisibleSegment(indPoint, false);
+            else
+                faceShape->getActivedPart()->setInvisibleSegment(indPoint, invisibleSegmentOption);
+        }
+    }
+    updateSegmentPoints();
+    updateSegmentPath();
 }
 
 
 
-void MarkupView::setScaleParam(const int &param)
+void MarkupView::setInvisibleSegmentOption(const bool &value)
 {
-    scaleSegmentParam = param/10.0;
+    invisibleSegmentOption = value;
+}
+
+
+
+void MarkupView::setBright(const int &value)
+{
+    this->brightValue = value;
+}
+
+
+
+void MarkupView::setScaleParam(const int &value)
+{
+    scaleSegmentValue = value/10.0;
     scaleOnSegment();
 }
 
@@ -192,14 +229,14 @@ void MarkupView::setScaleParam(const int &param)
 
 void MarkupView::scaleOnSegment()
 {
-    if (body->getActivedPart()->pointsSize() == 0)
+    if (faceShape->getActivedPart()->pointsSize() == 0)
         return;
 
-    QRectF box = body->getActivedPart()->getBox();
-    qreal x = box.x() - box.width()*scaleSegmentParam/2.0;
-    qreal y = box.y() - box.height()*scaleSegmentParam/2.0;
-    qreal w = box.width()*(scaleSegmentParam+1);
-    qreal h = box.height()*(scaleSegmentParam+1);
+    QRectF box = faceShape->getActivedPart()->getBox();
+    qreal x = box.x() - box.width()*scaleSegmentValue/2.0;
+    qreal y = box.y() - box.height()*scaleSegmentValue/2.0;
+    qreal w = box.width()*(scaleSegmentValue+1);
+    qreal h = box.height()*(scaleSegmentValue+1);
     fitInView (QRectF(x,y,w,h), Qt::KeepAspectRatio);
 }
 
@@ -207,50 +244,37 @@ void MarkupView::scaleOnSegment()
 
 int MarkupView::getContrast() const
 {
-    return contrastImage;
+    return contrastValue;
 }
 
 
 
 void MarkupView::contrast(QImage &image)
 {
-    int filter_a [9]= { -1,-1,-1,
-                        -1,9,-1,
-                       -1,-1,-1};
-         int sum = 1;
-         int r,g,b;
-         QColor color;
-         QImage image_new(image.width(),image.height(),QImage::Format_RGB32);
+    int r,g,b;
+    QColor color;
+    QImage image_new(image.width(),image.height(),QImage::Format_RGB32);
 
-         for(int x = 0; x < image.height(); x++){
-               for(int y = 0; y<image.width(); y++){
-                    /*
-                   for(int i = 0; i <= 2; i++){
-                       for(int j = 0; j <= 2; j++){
-                           color = QColor(image.pixel(y+i-1,x+j-1));
-                           r += color.red()*(filter_a[(j*3+i)]);
-                           g += color.green()*(filter_a[(j*3+i)]);
-                           b += color.blue()*(filter_a[(j*3+i)]);
-                       }
-                   }*/
-                   color = QColor(image.pixel(y,x));
-                   r = color.red();//qBound(0, r/sum, 255);
-                   g = color.green();//qBound(0, g/sum, 255);
-                   b = color.blue();//qBound(0, b/sum, 255);
+    for(int x = 0; x < image.height(); x++){
+        for(int y = 0; y<image.width(); y++){
+            color = QColor(image.pixel(y,x));
+            r = color.red();//qBound(0, r/sum, 255);
+            g = color.green();//qBound(0, g/sum, 255);
+            b = color.blue();//qBound(0, b/sum, 255);
 
-                   int contrast = (int)((100.000 / 100) * contrastImage);
+            int contrast = (int)((100.000 / 100) * contrastValue);
 
-                   int R3 = contrast < 0 ? (r * (100 - contrast) + 128 * contrast) / 100 : (r * 100 - 128 * contrast) / (101 - contrast);
-                   int R4 = R3 < 0 ? R4 = 0 : R3 > 255 ? R4 = 255 : R3;
-                   int G3 = contrast < 0 ? (g * (100 - contrast) + 128 * contrast) / 100 : (g * 100 - 128 * contrast) / (101 - contrast);
-                   int G4 = G3 < 0 ? G4 = 0 : G3 > 255 ? G4 = 255 : G3;
-                   int B3 = contrast < 0 ? (b * (100 - contrast) + 128 * contrast) / 100 : (b * 100 - 128 * contrast) / (101 - contrast);
-                   int B4 = B3 < 0 ? B4 = 0 : B3 > 255 ? B4 = 255 : B3;
+            int R3 = contrast < 0 ? (r * (100 - contrast) + 128 * contrast) / 100 : (r * 100 - 128 * contrast) / (101 - contrast);
+            int R4 = R3 < 0 ? R4 = 0 : R3 > 255 ? R4 = 255 : R3;
+            int G3 = contrast < 0 ? (g * (100 - contrast) + 128 * contrast) / 100 : (g * 100 - 128 * contrast) / (101 - contrast);
+            int G4 = G3 < 0 ? G4 = 0 : G3 > 255 ? G4 = 255 : G3;
+            int B3 = contrast < 0 ? (b * (100 - contrast) + 128 * contrast) / 100 : (b * 100 - 128 * contrast) / (101 - contrast);
+            int B4 = B3 < 0 ? B4 = 0 : B3 > 255 ? B4 = 255 : B3;
 
-                   image_new.setPixel(y,x, qRgb(R4,G4,B4));
-         }
-     }
-         image = image_new;
+            image_new.setPixel(y,x, qRgb(R4,G4,B4));
+        }
+    }
+    image = image_new;
 }
 
 
@@ -262,31 +286,22 @@ void MarkupView::bright(QImage &image)
     QImage image_new(image.width(),image.height(),QImage::Format_RGB32);
 
     for(int x = 0; x < image.height(); x++){
-          for(int y = 0; y<image.width(); y++){
-               /*
-              for(int i = 0; i <= 2; i++){
-                  for(int j = 0; j <= 2; j++){
-                      color = QColor(image.pixel(y+i-1,x+j-1));
-                      r += color.red()*(filter_a[(j*3+i)]);
-                      g += color.green()*(filter_a[(j*3+i)]);
-                      b += color.blue()*(filter_a[(j*3+i)]);
-                  }
-              }*/
-              color = QColor(image.pixel(y,x));
-              r = color.red();//qBound(0, r/sum, 255);
-              g = color.green();//qBound(0, g/sum, 255);
-              b = color.blue();//qBound(0, b/sum, 255);
+        for(int y = 0; y<image.width(); y++){
+            color = QColor(image.pixel(y,x));
+            r = color.red();//qBound(0, r/sum, 255);
+            g = color.green();//qBound(0, g/sum, 255);
+            b = color.blue();//qBound(0, b/sum, 255);
 
-              int bright = (int)((100.000 / 100) * brightImage);
+            int bright = (int)((100.000 / 100) * brightValue);
 
 
-              int R2 = r + bright * 128 / 100 <= 0 ? 0 : r + bright * 128 / 100 >= 255 ? 255 : r + bright * 128 / 100;
-              int G2 = g + bright * 128 / 100 <= 0 ? 0 : g + bright * 128 / 100 >= 255 ? 255 : g + bright * 128 / 100;
-                int B2 = b + bright * 128 / 100 <= 0 ? 0 : b + bright * 128 / 100 >= 255 ? 255 : b + bright * 128 / 100;
+            int R2 = r + bright * 128 / 100 <= 0 ? 0 : r + bright * 128 / 100 >= 255 ? 255 : r + bright * 128 / 100;
+            int G2 = g + bright * 128 / 100 <= 0 ? 0 : g + bright * 128 / 100 >= 255 ? 255 : g + bright * 128 / 100;
+            int B2 = b + bright * 128 / 100 <= 0 ? 0 : b + bright * 128 / 100 >= 255 ? 255 : b + bright * 128 / 100;
 
-              image_new.setPixel(y,x, qRgb(R2,G2,B2));
+            image_new.setPixel(y,x, qRgb(R2,G2,B2));
+        }
     }
-}
     image = image_new;
 }
 
@@ -312,9 +327,9 @@ float MarkupView::getDistance(const QPointF &point, const QPointF &p1, const QPo
 
 
 
-void MarkupView::setScaleSave(const bool &isSave)
+void MarkupView::setScaleSave(const bool &value)
 {
-    this->isScaleSave = isSave;
+    this->scaleSaveOption = value;
 }
 
 
@@ -326,79 +341,57 @@ QGraphicsScene *MarkupView::getScene()
 
 
 
-double MarkupView::point2SegmentProjectionParameter(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+void MarkupView::setAllowEdit(const bool &value)
 {
-    double l2 = sqrt((p2.x()-p1.x())*(p2.x()-p1.x()) + (p2.y()-p1.y())*(p2.y()-p1.y()));
-    double product = QVector2D::dotProduct(QVector2D(point-p1), QVector2D(p2 - p1)) / l2;
-    return qMin(qMax(product,0.0),1.0);
+    this->allowEditOption = value;
 }
 
 
 
-QPointF MarkupView::projectPoint2Segment(const QPointF &point, const QPointF &p1, const QPointF &p2) const
+void MarkupView::setDeleteOption(const bool &value)
 {
-    double t = point2SegmentProjectionParameter(point, p1, p2);
-    return p1 + t * (p2 - p1);
-}
-
-
-
-double MarkupView::distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2)
-{
-    QPointF projection = projectPoint2Segment(point, p1, p2);
-    return sqrt((projection.x()-point.x())*(projection.x()-point.x()) + (projection.y()-point.y())*(projection.y()-point.y())); //(point, projection);
-}
-
-
-
-void MarkupView::setAllowEdit(bool allow)
-{
-    this->allowEdit = allow;
-}
-
-
-
-void MarkupView::setDeleteOption(bool option)
-{
-    this->deleteOption = option;
+    this->deleteOption = value;
 }
 
 
 
 void MarkupView::deleteLandmark(const QPointF &click)
 {
-    clearScene(body->indActived);
-    for (int indPoint = 0; indPoint < body->getActivedPart()->points.size(); indPoint++){
-        QPointF landmark = body->getActivedPart()->points[indPoint]->scenePos();
-        bool amongX = (click.x() < landmark.x()+sizeLandmark*5) && (click.x() > landmark.x()-sizeLandmark*5);
-        bool amongY = (click.y() < landmark.y()+sizeLandmark*5) && (click.y() > landmark.y()-sizeLandmark*5);
+    clearScene(faceShape->indActived);
+    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->points.size(); indPoint++){
+        QPointF landmark = faceShape->getActivedPart()->points[indPoint]->scenePos();
+        bool amongX = (click.x() < landmark.x()+sizePointsValue*5) && (click.x() > landmark.x()-sizePointsValue*5);
+        bool amongY = (click.y() < landmark.y()+sizePointsValue*5) && (click.y() > landmark.y()-sizePointsValue*5);
         if (amongX && amongY){
-            body->getActivedPart()->deletePoint(indPoint);
+            faceShape->getActivedPart()->deletePoint(indPoint);
         }
     }
-    updateBodyPoints();
-    updateBodyPath();
+    updateSegmentPoints();
+    updateSegmentPath();
 }
 
 
 
-void MarkupView::clearScenePoints(int indPart)
+void MarkupView::clearScenePoints(const int &indPart)
 {
-    for (int indItem = 0; indItem < body->parts[indPart].pointsSize(); indItem++)
-        scene->removeItem(body->parts[indPart].points[indItem]);
+    for (int indItem = 0; indItem < faceShape->parts[indPart].pointsSize(); indItem++)
+        scene->removeItem(faceShape->parts[indPart].points[indItem]);
 }
 
 
 
-void MarkupView::clearScenePath(int indPart)
+void MarkupView::clearScenePath(const int &indPart)
 {
-    scene->removeItem(body->parts[indPart].pathUp);
-    scene->removeItem(body->parts[indPart].pathDown);
+    scene->removeItem(faceShape->parts[indPart].pathUp);
+    scene->removeItem(faceShape->parts[indPart].pathDown);
+    for (int indPath = 0; indPath < paths.size(); indPath++){
+        scene->removeItem(paths[indPath]);
+    }
 }
 
 
 
-void MarkupView::clearScene(int indPart)
+void MarkupView::clearScene(const int &indPart)
 {
     clearScenePoints(indPart);
     clearScenePath(indPart);
@@ -406,53 +399,54 @@ void MarkupView::clearScene(int indPart)
 
 
 
-void MarkupView::clearPoints(int indPart)
+void MarkupView::clearPoints(const int &indPart)
 {
-    body->parts[indPart].points.clear();
+    faceShape->parts[indPart].points.clear();
+    faceShape->parts[indPart].invisibleSegments.clear();
+    faceShape->parts[indPart].indInvisibleSegment = 0;
 }
 
 
 
-void MarkupView::clearPath(int indPart)
+void MarkupView::clearPath(const int &indPart)
 {
-    body->parts[indPart].pathUp = nullptr;
-    body->parts[indPart].pathDown = nullptr;
+    faceShape->parts[indPart].pathUp = nullptr;
+    faceShape->parts[indPart].pathDown = nullptr;
 }
 
 
 
-void MarkupView::clear(int indPart)
+void MarkupView::clear(const int &indPart)
 {
     clearPoints(indPart);
     clearPath(indPart);
-    body->parts[indPart].update();
+    faceShape->parts[indPart].update();
 }
 
 
 
-void MarkupView::clearAllPart(int indPart)
+void MarkupView::clearAllPart(const int &indPart)
 {
     clearScene(indPart);
     clear(indPart);
-    Body *b = body;
 }
 
 
 
 void MarkupView::clearAll()
 {
-    for (int indPart = 0; indPart < body->parts.size(); indPart++)
+    for (int indPart = 0; indPart < faceShape->parts.size(); indPart++)
         clearAllPart(indPart);
-    int indActivedPart = body->indActived;
-    body = new Body();
-    body->indActived = indActivedPart;
+    int indActivedPart = faceShape->indActived;
+    faceShape = new ShapeFace();
+    faceShape->indActived = indActivedPart;
 }
 
 
 
-Body *MarkupView::getBody()
+ShapeFace *MarkupView::getFaceShape()
 {
-    return body;
+    return faceShape;
 }
 
 
@@ -460,7 +454,7 @@ Body *MarkupView::getBody()
 Landmark *MarkupView::createLandmark(qreal x, qreal y, qreal w, qreal h, int ind, QPen pen, QBrush brush)
 {
     Landmark *landmark = new Landmark(x, y, w, h, ind, pen, brush);
-    connect(landmark, SIGNAL(changePosition(QPointF)), this, SLOT(updateBodyPath()));
+    connect(landmark, SIGNAL(changePosition(QPointF)), this, SLOT(updateSegmentPath()));
     return landmark;
 }
 
@@ -468,66 +462,139 @@ Landmark *MarkupView::createLandmark(qreal x, qreal y, qreal w, qreal h, int ind
 
 void MarkupView::changeSizeLandmark(const double &size)
 {
-    for (int indPoint = 0; indPoint < body->getActivedPart()->pointsSize(); indPoint++)
-        body->getActivedPart()->points[indPoint]->setSize(size);
-    sizeLandmark = size;
+    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->pointsSize(); indPoint++)
+        faceShape->getActivedPart()->points[indPoint]->setSize(size);
+    sizePointsValue = size;
 }
 
 
 
-void MarkupView::updateBodyPath()
+void MarkupView::updateSegmentPath()
 {
-    body->getActivedPart()->update();
-    clearScenePath(body->indActived);
+    faceShape->getActivedPart()->update();
+    clearScenePath(faceShape->indActived);
 
-    if (body->getActivedPart()->pointsSize() < 4)
+    if (faceShape->getActivedPart()->pointsSize() < 4)
         return;
 
-    QVector<QPointF> pointsUp = body->getActivedPart()->up;
-    QVector<QPointF> pointsCorners = body->getActivedPart()->corner;
-    QVector<QPointF> pointsDown = body->getActivedPart()->down;
+    QVector<QPointF> pointsUp = faceShape->getActivedPart()->up;
+    QVector<QPointF> pointsCorners = faceShape->getActivedPart()->corner;
+    QVector<QPointF> pointsDown = faceShape->getActivedPart()->down;
+
+    QList<QVector<int>> invisibleSegmentInd = faceShape->getActivedPart()->invisibleSegments;
 
     pointsUp.push_front(pointsCorners.first());
     pointsUp.push_back(pointsCorners.last());
-    QPainterPath pathUp = Spline::build(QPolygonF(pointsUp));
 
-    body->getActivedPart()->pathUp = new QGraphicsPathItem(pathUp);
+    //    const int size = pointsUp.size();
+    //    Spline<QVector2D> splineUp;
+    //    for (int indPoint = 0; indPoint < pointsUp.size(); indPoint++){
+    //        splineUp.add(QVector2D(pointsUp[indPoint]));
+    //    }
+
+    //    QPainterPath pathUp;
+    //    pathUp.moveTo(pointsUp[0].x(), pointsUp[0].y());
+    //    float len = pointsUp.last().x() - pointsUp.first().x();
+    //    len = qFabs(len);
+
+    //    for (float x = 0; x < splineUp.length(); x = x + 1.0/(len/5)){
+    //        QVector2D pt = splineUp.at(x);
+    //        pathUp.lineTo(pt.toPointF());
+    //    }
+
+    //QPainterPath pathUp ;//= Spline::build(QPolygonF(pointsUp));
+
+    //    //
+    //    tinyspline::BSpline bspline(pointsUp.size());
+    //    std::vector<tinyspline::real> ctrlp = bspline.ctrlp();
+    //    int indCtrl = 0;
+    //    for (int ind = 0; ind < ctrlp.size()-1; ind = ind+2){
+    //        ctrlp[ind] = pointsUp[indCtrl].x();
+    //        ctrlp[ind+1] = pointsUp[indCtrl].y();
+    //        indCtrl++;
+    //    }
+    //    bspline.setCtrlp(ctrlp);
+    //    //tinyspline::BSpline beziers = bspline.derive().toBeziers();
+    //    QPainterPath pathUp;
+    //    pathUp.moveTo(pointsUp[0].x(), pointsUp[0].y());
+
+    //    for (double x = pointsUp[0].x()+1; x <= pointsUp.last().x(); x = x + 1){
+    //        std::vector<tinyspline::real> result;
+    //        result =bspline.evaluate(x).result(); // beziers(x).result();
+    //        pathUp.lineTo(x, result[result.size()-1]);
+    //    }
+    //
+    SplineAdapter splineUp;
+    splineUp.setPoints(pointsUp);
+    QPainterPath pathUp = splineUp.getPath();
+
+    faceShape->getActivedPart()->pathUp = new QGraphicsPathItem(pathUp);
     QPen penUp(Qt::green);
     penUp.setWidth(0.1);
-    body->getActivedPart()->pathUp->setPen(penUp);
-    scene->addItem(body->getActivedPart()->pathUp);
+    faceShape->getActivedPart()->pathUp->setPen(penUp);
+    scene->addItem(faceShape->getActivedPart()->pathUp);
 
     pointsDown.push_front(pointsCorners.last());
     pointsDown.push_back(pointsCorners.first());
-    QPainterPath pathDown = Spline::build(QPolygonF(pointsDown));
+    //QPainterPath pathDown; //= Spline::build(QPolygonF(pointsDown));
+    SplineAdapter splineDown;
+    splineDown.setPoints(pointsDown);
+    QPainterPath pathDown = splineDown.getPath();
 
-    body->getActivedPart()->pathDown = new QGraphicsPathItem(pathDown);
+    faceShape->getActivedPart()->pathDown = new QGraphicsPathItem(pathDown);
     QPen penDown(Qt::blue);
     penDown.setWidth(0.1);
-    body->getActivedPart()->pathDown->setPen(penDown);
-    scene->addItem(body->getActivedPart()->pathDown);
+    faceShape->getActivedPart()->pathDown->setPen(penDown);
+    scene->addItem(faceShape->getActivedPart()->pathDown);
+
+    if (invisibleSegmentInd.size() != 0){
+        int size = invisibleSegmentInd.size();
+
+        for (int indSegment = 0; indSegment < size; indSegment++){
+            for (int indPoint = 0; indPoint < invisibleSegmentInd[indSegment].size()-1; indPoint++){
+                int indFirstPoint = invisibleSegmentInd[indSegment].at(indPoint);
+                int indSecondPoint = invisibleSegmentInd[indSegment].at(indPoint+1);
+                QPointF firstPoint = faceShape->getActivedPart()->points[indFirstPoint]->scenePos();
+                QPointF secondPoint = faceShape->getActivedPart()->points[indSecondPoint]->scenePos();
+
+                QPainterPath path;
+                if (!faceShape->getActivedPart()->down.contains(firstPoint))
+                    path = splineUp.getPath(firstPoint.x(), secondPoint.x());
+                else
+                    path = splineDown.getPath(firstPoint.x(), secondPoint.x());
+
+                paths.push_back(new QGraphicsPathItem(path));
+                QPen penUp;
+                penUp.setColor(Qt::white);
+                if (faceShape->getActivedPart()->indInvisibleSegment == indSegment)
+                    penUp.setColor(Qt::yellow);
+                penUp.setWidth(1);
+                paths.last()->setPen(penUp);
+                scene->addItem(paths.last());
+            }
+        }
+    }
 
 }
 
 
 
-void MarkupView::updateBodyPoints()
+void MarkupView::updateSegmentPoints()
 {
-    clearScenePoints(body->indActived);
-    for (int indPoint = 0; indPoint < body->getActivedPart()->pointsSize(); indPoint++)
-        scene->addItem(body->getActivedPart()->points[indPoint]);
+    clearScenePoints(faceShape->indActived);
+
+    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->pointsSize(); indPoint++)
+        scene->addItem(faceShape->getActivedPart()->points[indPoint]);
 }
 
 
 
 void MarkupView::wheelEvent(QWheelEvent *event)
 {
-    const float scaleFactor = 1.15;
-
     if (event->delta() > 0)
-        scale(scaleFactor, scaleFactor);
+        scale(scaleValue, scaleValue);
     else
-        scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+        scale(1.0 / scaleValue, 1.0 / scaleValue);
 }
 
 
@@ -539,23 +606,23 @@ void MarkupView::mousePressEvent(QMouseEvent *event)
     else
         this->setDragMode(DragMode::NoDrag);
 
-    if (deleteOption == false)
+    if (deleteOption == false || invisibleSegmentOption == false)
         QGraphicsView::mousePressEvent(event);
 
-    if (deleteOption == true)
+    if (deleteOption == true || invisibleSegmentOption == true)
         viewport()->setCursor(Qt::PointingHandCursor);
     else if (event->modifiers() != Qt::ShiftModifier)
         viewport()->setCursor(Qt::CrossCursor);
 
     bool isLeftButton = (event->button() == Qt::LeftButton);
     bool isModifiers = (event->modifiers() == Qt::ShiftModifier);
-    bool isClickedMark = clickOnLandmark(mapToScene(event->pos()), sizeLandmark*5);
+    bool isClickedMark = clickOnLandmark(mapToScene(event->pos()), sizePointsValue*5);
 
-    if (!isLeftButton || isModifiers || isClickedMark || deleteOption == true || allowEdit == false)
+    if (!isLeftButton || isModifiers || isClickedMark || deleteOption == true || allowEditOption == false || invisibleSegmentOption == true)
         return;
 
     QPointF position = mapToScene(event->pos());
-    Landmark *landmark = createLandmark(position.x(), position.y(), sizeLandmark, sizeLandmark);
+    Landmark *landmark = createLandmark(position.x(), position.y(), sizePointsValue, sizePointsValue);
     addLandmark(landmark);
 }
 
@@ -564,7 +631,7 @@ void MarkupView::mousePressEvent(QMouseEvent *event)
 void MarkupView::mouseMoveEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseMoveEvent(event);
-    if (deleteOption == true)
+    if (deleteOption == true || invisibleSegmentOption == true)
         viewport()->setCursor(Qt::PointingHandCursor);
     else if (event->modifiers() != Qt::ShiftModifier)
         viewport()->setCursor(Qt::CrossCursor);
@@ -575,7 +642,7 @@ void MarkupView::mouseMoveEvent(QMouseEvent *event)
 void MarkupView::mouseReleaseEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseReleaseEvent(event);
-    if (deleteOption == true)
+    if (deleteOption == true || invisibleSegmentOption == true)
         viewport()->setCursor(Qt::PointingHandCursor);
     else if (event->modifiers() != Qt::ShiftModifier)
         viewport()->setCursor(Qt::CrossCursor);
@@ -586,16 +653,20 @@ void MarkupView::mouseReleaseEvent(QMouseEvent *event)
 void MarkupView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     QGraphicsView::mouseDoubleClickEvent(event);
-    if (deleteOption == true)
+    if (deleteOption == true || invisibleSegmentOption == true)
         viewport()->setCursor(Qt::PointingHandCursor);
     else if (event->modifiers() != Qt::ShiftModifier)
         viewport()->setCursor(Qt::CrossCursor);
 
     bool isLeftButton = (event->button() == Qt::LeftButton);
-    bool isClickedMark = clickOnLandmark(mapToScene(event->pos()), sizeLandmark*5);
+    bool isClickedMark = clickOnLandmark(mapToScene(event->pos()), sizePointsValue*5);
 
-    if (!isLeftButton || !isClickedMark || deleteOption == false)
+    if (!isLeftButton || !isClickedMark)
         return;
 
-    deleteLandmark(mapToScene(event->pos()));
+    if (deleteOption)
+        deleteLandmark(mapToScene(event->pos()));
+
+    if (invisibleSegmentOption)
+        setInvisibleSegmentPoint(mapToScene(event->pos()));
 }

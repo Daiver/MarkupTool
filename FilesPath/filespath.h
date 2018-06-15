@@ -12,7 +12,7 @@ struct FilePath
     QString dir;
 
     void setPath(const QString &path);
-    QString fullName() const;
+    QString getFullName() const;
     void setFormat(const QString &format);
 };
 

@@ -44,23 +44,51 @@ void Landmark::setIndex(const int &index)
 
 
 
-bool Landmark::getEnd() const
+void Landmark::setInvsibile(bool value)
+{
+    invisible = value;
+}
+
+
+
+bool Landmark::isInvisble()
+{
+    return invisible;
+}
+
+
+
+bool Landmark::isEnd() const
 {
     return end;
 }
 
 
 
-bool Landmark::getStart() const
+bool Landmark::isStart() const
 {
     return start;
 }
 
 
 
-bool Landmark::getUp() const
+bool Landmark::isUp() const
 {
     return up;
+}
+
+
+
+bool Landmark::isUpCentral() const
+{
+    return upCentral;
+}
+
+
+
+bool Landmark::isDownCentral() const
+{
+    return downCentral;
 }
 
 
@@ -86,6 +114,20 @@ void Landmark::setUp(const bool value)
 
 
 
+void Landmark::setUpCentral(const bool value)
+{
+    upCentral = value;
+}
+
+
+
+void Landmark::setDownCentral(const bool value)
+{
+    downCentral = value;
+}
+
+
+
 void Landmark::setSize(const double &size)
 {
     this->setRect(-size/2, -size/2, size, size);
@@ -105,6 +147,26 @@ void Landmark::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
         pen.setColor(Qt::green);
         brush.setColor(Qt::green);
     }
+
+    if (start){
+        pen.setColor(Qt::red);
+        brush.setColor(Qt::red);
+    }
+
+    if (upCentral || downCentral){
+        pen.setColor(Qt::red);
+        brush.setColor(Qt::red);
+    }
+
+    if (invisible){
+        pen.setColor(Qt::white);
+        brush.setColor(Qt::white);
+    }
+
+    //    if (invisible && (upCentral || downCentral || start || up)){
+    //        pen.setColor(Qt::yellow);
+    //        brush.setColor(Qt::yellow);
+    //    }
 
     QRectF rect = this->boundingRect();
     painter->setPen(pen);

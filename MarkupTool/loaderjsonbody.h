@@ -6,8 +6,10 @@
 
 namespace LoaderJSON
 {
-    Body getBody(const QJsonDocument &doc);
-    QJsonDocument createJson(const Body *body);
+    ShapeFace getBody(const QJsonDocument &doc);
+    QJsonDocument createJson(const ShapeFace *body);
+    QJsonObject getInvisibleSegment(const Segment &segment);
+    QList<QVector<int>> getInvisibleSegment(QJsonArray &obj);
 }
 
 #endif // LOADERJSONBODY_H

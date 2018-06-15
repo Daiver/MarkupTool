@@ -1,19 +1,21 @@
 #include "body.h"
 
-void Part::addPoint(Landmark *point, int indInsert)
+void Segment::addPoint(Landmark *point, int indInsert)
 {
     points.insert(indInsert, point);
 
     if (points.size() == 4){
         points[2]->setEnd(true);
         points[0]->setStart(true);
+        points[1]->setUpCentral(true);
+        points[3]->setDownCentral(true);
     }
 
     if (indInsert == 0 || indInsert == 1 || indInsert == 2)
         point->setUp(true);
 
     for (int indPoint = indInsert; indPoint < points.size();indPoint++){
-        if (points[indPoint]->getEnd() == true && indInsert < indPoint)
+        if (points[indPoint]->isEnd() == true && indInsert < indPoint)
             point->setUp(true);
         points[indPoint]->setIndex(indPoint);
     }
@@ -23,13 +25,13 @@ void Part::addPoint(Landmark *point, int indInsert)
 
 
 
-void Part::loadPoint(Landmark *point, int indInsert)
+void Segment::loadPoint(Landmark *point, int indInsert)
 {
     points.insert(indInsert, point);
     point->setUp(true);
 
     for (int indPoint = 0; indPoint < points.size(); indPoint++)
-        if (points[indPoint]->getEnd() == true && indInsert > indPoint)
+        if (points[indPoint]->isEnd() == true && indInsert > indPoint)
             point->setUp(false);
 
     for (int indPoint = indInsert; indPoint < points.size();indPoint++)
@@ -40,7 +42,38 @@ void Part::loadPoint(Landmark *point, int indInsert)
 
 
 
-void Part::deletePoint(int indPoint)
+void Segment::setInvisible(int indPoint, bool value)
+{
+    points[indPoint]->setInvsibile(value);
+    invisible.push_back(indPoint);
+}
+
+
+
+void Segment::setInvisibleSegment(int indPoint, bool value)
+{
+    if (invisibleSegments.size() == 0)
+        invisibleSegments.push_back(QVector<int>());
+
+    points[indPoint]->setInvsibile(value);
+    invisible.push_back(indPoint);
+
+    if (value == false && invisibleSegments[indInvisibleSegment].contains(indPoint))
+        invisibleSegments[indInvisibleSegment].removeOne(indPoint);
+    else
+        invisibleSegments[indInvisibleSegment].push_back(indPoint);
+}
+
+
+
+void Segment::clearInvisibleSegment()
+{
+    invisibleSegments.clear();
+}
+
+
+
+void Segment::deletePoint(int indPoint)
 {
     points.removeAt(indPoint);
     update();
@@ -48,28 +81,34 @@ void Part::deletePoint(int indPoint)
 
 
 
-void Part::update()
+void Segment::update()
 {
+    invisible.clear();
     corner.clear();
+    centers.clear();
     up.clear();
     down.clear();
 
     for (int indPoint = 0; indPoint < points.size(); indPoint++){
-        if (points[indPoint]->getStart() == true || points[indPoint]->getEnd() == true)
+        if (points[indPoint]->isInvisble() == true)
+            invisible.push_back(indPoint);
+        if (points[indPoint]->isStart() == true || points[indPoint]->isEnd() == true)
             corner.push_back(points[indPoint]->scenePos());
-        if (points[indPoint]->getUp() == true && points[indPoint]->getStart() == false && points[indPoint]->getEnd() == false)
+        if (points[indPoint]->isUpCentral() == true || points[indPoint]->isDownCentral() == true)
+            centers.push_back(points[indPoint]->scenePos());
+        if (points[indPoint]->isUp() == true && points[indPoint]->isStart() == false && points[indPoint]->isEnd() == false)
             up.push_back(points[indPoint]->scenePos());
-        if (points[indPoint]->getUp() == false)
+        if (points[indPoint]->isUp() == false)
             down.push_back(points[indPoint]->scenePos());
     }
 }
 
 
 
-Landmark *Part::getEnd()
+Landmark *Segment::getEnd()
 {
     for (int indPoint = 0; indPoint < pointsSize(); indPoint++)
-        if (points[indPoint]->getEnd() == true)
+        if (points[indPoint]->isEnd() == true)
             return points[indPoint];
 
     return nullptr;
@@ -77,10 +116,10 @@ Landmark *Part::getEnd()
 
 
 
-Landmark *Part::getStart()
+Landmark *Segment::getStart()
 {
     for (int indPoint = 0; indPoint < pointsSize(); indPoint++)
-        if (points[indPoint]->getStart() == true)
+        if (points[indPoint]->isStart() == true)
             return points[indPoint];
 
     return nullptr;
@@ -88,7 +127,7 @@ Landmark *Part::getStart()
 
 
 
-QPointF Part::getCentral()
+QPointF Segment::getCentral()
 {
     QPointF start = getStart()->scenePos();
     QPointF end = getEnd()->scenePos();
@@ -99,7 +138,7 @@ QPointF Part::getCentral()
 
 
 
-QRect Part::getBox() const
+QRect Segment::getBox() const
 {
     float xMin = 100000000, yMin = 100000000, xMax = 0, yMax = 0;
 
@@ -126,18 +165,46 @@ QRect Part::getBox() const
 
 
 
-int Part::pointsSize() const
+int Segment::pointsSize() const
 {
     return points.size();
 }
 
 
 
-Body::Body()
+void Segment::nextInvisibleSegment()
 {
-    Part leftEye;
-    Part rightEye;
-    Part mouth;
+    if (invisibleSegments.size() <= indInvisibleSegment+1)
+        invisibleSegments.push_back(QVector<int>());
+
+    if (invisibleSegments[indInvisibleSegment].size() == 0){
+        invisibleSegments.removeAt(indInvisibleSegment);
+        indInvisibleSegment--;
+    }
+
+    indInvisibleSegment++;
+}
+
+
+
+void Segment::pastInvisibleSegment()
+{
+    if (indInvisibleSegment-1 < 0)
+        return;
+
+    if (invisibleSegments[indInvisibleSegment].size() == 0)
+        invisibleSegments.removeAt(indInvisibleSegment);
+
+    indInvisibleSegment--;
+}
+
+
+
+ShapeFace::ShapeFace()
+{
+    Segment leftEye;
+    Segment rightEye;
+    Segment mouth;
 
     parts.push_back(leftEye);
     parts.push_back(rightEye);
@@ -146,14 +213,14 @@ Body::Body()
 
 
 
-Part *Body::getActivedPart()
+Segment *ShapeFace::getActivedPart()
 {
     return &parts[indActived];
 }
 
 
 
-bool Body::isEmpty() const
+bool ShapeFace::isEmpty() const
 {
     for (int indPart = 0; indPart < parts.size(); indPart++)
         if (parts[indPart].pointsSize() != 0)

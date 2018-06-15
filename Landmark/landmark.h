@@ -23,13 +23,20 @@ public:
     void setSize(const QSize &size);
     void setIndex(const int &index);
 
-    bool getEnd() const;
-    bool getStart() const;
-    bool getUp() const;
+    void setInvsibile(bool value);
+    bool isInvisble();
+
+    bool isEnd() const;
+    bool isStart() const;
+    bool isUp() const;
+    bool isUpCentral() const;
+    bool isDownCentral() const;
 
     void setEnd(const bool value);
     void setStart(const bool value);
     void setUp(const bool value);
+    void setUpCentral(const bool value);
+    void setDownCentral(const bool value);
 
     void setSize(const double &size);
 
@@ -40,7 +47,11 @@ private:
     int index;
     bool up = false;
     bool end = false;
+    bool upCentral = false;
+    bool downCentral = false;
     bool start = false;
+    bool invisible = false;
+
     QPen pen;
     QBrush brush;
 };

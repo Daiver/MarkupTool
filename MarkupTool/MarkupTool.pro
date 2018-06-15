@@ -28,17 +28,21 @@ include(../Landmark/Landmark.pri)
 include(../LoaderJSON/LoaderJSON.pri)
 include(../Body/Body.pri)
 include(../Spline/Spline.pri)
+include(../alglib/alglib.pri)
 
 SOURCES += \
         main.cpp \
         markupwindow.cpp \
     markupview.cpp \
-    loaderjsonbody.cpp
+    loaderjsonbody.cpp \
+    splineadapter.cpp
 
 HEADERS += \
         markupwindow.h \
     markupview.h \
-    loaderjsonbody.h
+    loaderjsonbody.h \
+    splinev2.h \
+    splineadapter.h
 
 FORMS += \
         markupwindow.ui

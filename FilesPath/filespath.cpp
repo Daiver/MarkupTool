@@ -85,7 +85,7 @@ QStringList FilesPath::getFullNames() const
     QStringList names;
 
     for (int indPath = 0; indPath < size(); indPath++)
-        names.push_back(files[indPath].fullName());
+        names.push_back(files[indPath].getFullName());
 
     return names;
 }
@@ -128,7 +128,7 @@ void FilePath::setPath(const QString &path)
 
 
 
-QString FilePath::fullName() const
+QString FilePath::getFullName() const
 {
     return dir + name + '.' + format;
 }

@@ -40,3 +40,25 @@ QJsonArray LoaderJSON::getArray(const QVector<QPointF> &points)
     }
     return array;
 }
+
+
+
+QVector<int> LoaderJSON::getIndex(const QJsonArray &array)
+{
+    QVector<int> points;
+    for (int indPoint = 0; indPoint < array.size();indPoint++)
+        points.push_back(array[indPoint].toInt());
+
+    return points;
+}
+
+
+
+QJsonArray LoaderJSON::getArray(const QVector<int> &points)
+{
+    QJsonArray array;
+    for (int indPoint = 0; indPoint < points.size(); indPoint++)
+        array.push_back(points[indPoint]);
+
+    return array;
+}

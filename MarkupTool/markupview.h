@@ -1,4 +1,4 @@
-#ifndef MARKUPVIEW_H
+    #ifndef MARKUPVIEW_H
 #define MARKUPVIEW_H
 
 #include <QGraphicsView>
@@ -10,7 +10,11 @@
 #include <QGraphicsBlurEffect>
 
 #include "body.h"
-#include "spline.h"
+#include "QtMath"
+#include "qmath.h"
+
+#include "interpolation.h"
+#include "splineadapter.h"
 
 class MarkupView : public QGraphicsView
 {
@@ -19,42 +23,43 @@ public:
     explicit MarkupView(QWidget *parent = 0);
 
     Landmark* createLandmark(qreal x, qreal y, qreal w, qreal h, int ind = 0, QPen pen = QPen(Qt::green), QBrush brush = QBrush(Qt::green));
-    Body* getBody();
     void drawImage(const QImage &image);
     bool clickOnLandmark(const QPointF &point, const float &radius) const;
-    void addLandmark(Landmark *point);
+    void addLandmark(Landmark *point, bool updatePath = true);
     void changeSizeLandmark(const double &size);
-    void changeBodyPart(int indBlock);
-    void setBody(Body newBody);
-    void updateImage(QImage &image);
-    void setScaleParam(const int &param);
+    void changeSegment(const int &indSegment);
+    void updateImage(const QImage &image);
     void scaleOnSegment();
-    int getContrast() const;
-    void setContrast(int value);
-    int getBright() const;
-    void setBright(int value);
     void contrast(QImage &image);
     void bright(QImage &image);
+
     float getDistance(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
-    void setScaleSave(const bool &isSave);
+    int getContrast() const;
+    int getBright() const;
+
+    ShapeFace* getFaceShape();
     QGraphicsScene* getScene();
 
-    double point2SegmentProjectionParameter(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
-    QPointF projectPoint2Segment(const QPointF &point, const QPointF &p1, const QPointF &p2) const;
-    double distFromPoint2SegmentSq(const QPointF &point, const QPointF &p1, const QPointF &p2);
+    void setFaceShape(ShapeFace newFaceShape);
+    void setScaleParam(const int &value);
+    void setContrast(const int &value);
+    void setBright(const int &value);
+    void setAllowEdit(const bool &value);
+    void setDeleteOption(const bool &value);
+    void setScaleSave(const bool &value);
+    void setInvisibleSegmentPoint(const QPointF &point);
+    void setInvisibleSegmentOption(const bool &value);
 
     void centralOnSegment();
-    void setAllowEdit(bool allow);
-    void setDeleteOption(bool option);
     void deleteLandmark(const QPointF &click);
 
-    void clearScenePoints(int indPart);
-    void clearScenePath(int indPart);
-    void clearScene(int indPart);
-    void clearPoints(int indPart);
-    void clearPath(int indPart);
-    void clear(int indPart);
-    void clearAllPart(int indPart);
+    void clearScenePoints(const int &indPart);
+    void clearScenePath(const int &indPart);
+    void clearScene(const int &indPart);
+    void clearPoints(const int &indPart);
+    void clearPath(const int &indPart);
+    void clear(const int &indPart);
+    void clearAllPart(const int &indPart);
     void clearAll();
 
 public slots:
@@ -64,20 +69,27 @@ public slots:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
-    void updateBodyPath();
-    void updateBodyPoints();
+    void updateSegmentPath();
+    void updateSegmentPoints();
 
 private:
     QGraphicsScene *scene = nullptr;
-    QGraphicsItem *image = nullptr;
-    int contrastImage = 0;
-    int brightImage = 0;
+    QGraphicsItem *imageItem = nullptr;
+    QVector<QGraphicsPathItem*> paths;
+    QImage image;
+
+    int contrastValue = 0;
+    int brightValue = 0;
+    float scaleValue = 1.15;
+    float scaleSegmentValue = 2;
+    float sizePointsValue = 0.5;
+
     bool deleteOption = false;
-    bool allowEdit = true;
-    bool isScaleSave = true;
-    float scaleSegmentParam = 2;
-    float sizeLandmark = 0.5;
-    Body *body = new Body();
+    bool allowEditOption = true;
+    bool invisibleSegmentOption = false;
+    bool scaleSaveOption = true;
+
+    ShapeFace *faceShape = new ShapeFace();
 };
 
 #endif // MARKUPVIEW_H

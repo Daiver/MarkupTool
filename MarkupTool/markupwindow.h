@@ -10,6 +10,7 @@
 #include <QMessageBox>
 #include <QClipboard>
 #include "filespath.h"
+#include "QElapsedTimer"
 #include "loaderjsonbody.h"
 
 namespace Ui {

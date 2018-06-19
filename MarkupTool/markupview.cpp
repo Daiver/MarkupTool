@@ -47,12 +47,12 @@ bool MarkupView::clickOnLandmark(const QPointF &point, const float &radius) cons
 void MarkupView::addLandmark(Landmark *point, bool updatePath)
 {
 
-    if (faceShape->getActivedPart()->pointsSize() < 4){
+    if (faceShape->getActivedPart()->getPointsSize() < 4){
         int ind = 0;
-        for (int indPoint = 0; indPoint < faceShape->getActivedPart()->pointsSize(); indPoint++)
+        for (int indPoint = 0; indPoint < faceShape->getActivedPart()->getPointsSize(); indPoint++)
             ind++;
         faceShape->getActivedPart()->addPoint(point, ind);
-        if(faceShape->getActivedPart()->pointsSize() == 4 && updatePath)
+        if(faceShape->getActivedPart()->getPointsSize() == 4 && updatePath)
             updateSegmentPath();
         scene->addItem(point);
         return;
@@ -98,41 +98,88 @@ void MarkupView::changeSegment(const int &indSegment)
 
 void MarkupView::setFaceShape(ShapeFace newFaceShape)
 {
+//    int indActived = faceShape->indActived;
+//    clearScene(faceShape->indActived);
+//    faceShape = new ShapeFace();
+//    faceShape->indActived = indActived;
+
+//    for (int indPart = 0; indPart < newFaceShape.parts.size(); indPart++){
+//        Segment part = newFaceShape.parts[indPart];
+//        faceShape->indActived = indPart;
+//        faceShape->getActivedPart()->indInvisibleSegment = 0;
+//        if (part.corner.size() == 0)
+//            continue;
+
+//        Landmark *cornerLeft = createLandmark(part.corner[0].x(), part.corner[0].y(), sizePointsValue, sizePointsValue, indPart);
+//        Landmark *centralUp = createLandmark(part.centers[0].x(), part.centers[0].y(), sizePointsValue, sizePointsValue, indPart);
+//        Landmark *cornerRight = createLandmark(part.corner[1].x(), part.corner[1].y(), sizePointsValue, sizePointsValue, indPart);
+//        Landmark *centralDown = createLandmark(part.centers[1].x(), part.centers[1].y(), sizePointsValue, sizePointsValue, indPart);
+
+//        faceShape->parts[indPart].invisibleSegments = part.invisibleSegments;
+//        addLandmark(cornerLeft, false);
+//        addLandmark(centralUp, false);
+//        addLandmark(cornerRight, false);
+//        addLandmark(centralDown, false);
+
+//        for (int indPoint = 0; indPoint < part.up.size(); indPoint++){
+//            if (faceShape->parts[indPart].up.contains(part.up[indPoint]))
+//                continue;
+//            Landmark *landmark = createLandmark(part.up[indPoint].x(), part.up[indPoint].y(), sizePointsValue, sizePointsValue);
+//            addLandmark(landmark, false);
+//        }
+
+//        for (int indPoint = 0; indPoint < part.down.size(); indPoint++){
+//            if (faceShape->parts[indPart].down.contains(part.down[indPoint]))
+//                continue;
+//            Landmark *landmark = createLandmark(part.down[indPoint].x(), part.down[indPoint].y(), sizePointsValue, sizePointsValue);
+//            addLandmark(landmark, false);
+//        }
+//    }
+
+//    for (int indPart = 0; indPart < faceShape->parts.size(); indPart++)
+//        for (int indInvSeg = 0; indInvSeg < newFaceShape.parts[indPart].invisibleSegments.size(); indInvSeg++)
+//            for (int ind = 0; ind < newFaceShape.parts[indPart].invisibleSegments[indInvSeg].size(); ind++)
+//                faceShape->parts[indPart].points[newFaceShape.parts[indPart].invisibleSegments[indInvSeg].at(ind)]->setInvsibile(true);
+
+
+//    faceShape->indActived = indActived;
+//    updateSegmentPoints();
+//    updateSegmentPath();
+//    scaleOnSegment();
+
     int indActived = faceShape->indActived;
     clearScene(faceShape->indActived);
     faceShape = new ShapeFace();
     faceShape->indActived = indActived;
 
     for (int indPart = 0; indPart < newFaceShape.parts.size(); indPart++){
-        Segment part = newFaceShape.parts[indPart];
-        faceShape->indActived = indPart;
-        faceShape->getActivedPart()->indInvisibleSegment = 0;
-        if (part.corner.size() == 0)
+        faceShape->parts[indPart].invisibleSegments = newFaceShape.parts[indPart].invisibleSegments;
+        int indPoint = 0;
+        if (newFaceShape.parts[indPart].corner.size() == 0)
             continue;
+        Landmark *landmark = createLandmark(newFaceShape.parts[indPart].corner[indPoint].x(), newFaceShape.parts[indPart].corner[indPoint].y(), sizePointsValue, sizePointsValue, indPoint);
+        landmark->setStart(true);
+        faceShape->parts[indPart].loadPoint(landmark, indPoint);
 
-        Landmark *cornerLeft = createLandmark(part.corner[0].x(), part.corner[0].y(), sizePointsValue, sizePointsValue, indPart);
-        Landmark *centralUp = createLandmark(part.centers[0].x(), part.centers[0].y(), sizePointsValue, sizePointsValue, indPart);
-        Landmark *cornerRight = createLandmark(part.corner[1].x(), part.corner[1].y(), sizePointsValue, sizePointsValue, indPart);
-        Landmark *centralDown = createLandmark(part.centers[1].x(), part.centers[1].y(), sizePointsValue, sizePointsValue, indPart);
-
-        faceShape->parts[indPart].invisibleSegments = part.invisibleSegments;
-        addLandmark(cornerLeft, false);
-        addLandmark(centralUp, false);
-        addLandmark(cornerRight, false);
-        addLandmark(centralDown, false);
-
-        for (int indPoint = 0; indPoint < part.up.size(); indPoint++){
-            if (faceShape->parts[indPart].up.contains(part.up[indPoint]))
-                continue;
-            Landmark *landmark = createLandmark(part.up[indPoint].x(), part.up[indPoint].y(), sizePointsValue, sizePointsValue);
-            addLandmark(landmark, false);
+        for (int indPointUp = 0; indPointUp < newFaceShape.parts[indPart].up.size(); indPointUp++){
+            indPoint++;
+            Landmark *landmark = createLandmark(newFaceShape.parts[indPart].up[indPointUp].x(), newFaceShape.parts[indPart].up[indPointUp].y(), sizePointsValue, sizePointsValue, indPoint);
+            if (newFaceShape.parts[indPart].centers[0] == landmark->scenePos())
+                landmark->setUpCentral(true);
+            faceShape->parts[indPart].loadPoint(landmark, indPoint);
         }
 
-        for (int indPoint = 0; indPoint < part.down.size(); indPoint++){
-            if (faceShape->parts[indPart].down.contains(part.down[indPoint]))
-                continue;
-            Landmark *landmark = createLandmark(part.down[indPoint].x(), part.down[indPoint].y(), sizePointsValue, sizePointsValue);
-            addLandmark(landmark, false);
+        indPoint++;
+        Landmark *landmark2 = createLandmark(newFaceShape.parts[indPart].corner[1].x(), newFaceShape.parts[indPart].corner[1].y(), sizePointsValue, sizePointsValue, indPoint);
+        landmark2->setEnd(true);
+        faceShape->parts[indPart].loadPoint(landmark2, indPoint);
+
+        for (int indPointDown = 0; indPointDown < newFaceShape.parts[indPart].down.size(); indPointDown++){
+            indPoint++;
+            Landmark *landmark = createLandmark(newFaceShape.parts[indPart].down[indPointDown].x(), newFaceShape.parts[indPart].down[indPointDown].y(), sizePointsValue, sizePointsValue, indPoint);
+            if (newFaceShape.parts[indPart].centers[1] == landmark->scenePos())
+                landmark->setDownCentral(true);
+            faceShape->parts[indPart].loadPoint(landmark, indPoint);
         }
     }
 
@@ -140,7 +187,6 @@ void MarkupView::setFaceShape(ShapeFace newFaceShape)
         for (int indInvSeg = 0; indInvSeg < newFaceShape.parts[indPart].invisibleSegments.size(); indInvSeg++)
             for (int ind = 0; ind < newFaceShape.parts[indPart].invisibleSegments[indInvSeg].size(); ind++)
                 faceShape->parts[indPart].points[newFaceShape.parts[indPart].invisibleSegments[indInvSeg].at(ind)]->setInvsibile(true);
-
 
     faceShape->indActived = indActived;
     updateSegmentPoints();
@@ -229,7 +275,7 @@ void MarkupView::setScaleParam(const int &value)
 
 void MarkupView::scaleOnSegment()
 {
-    if (faceShape->getActivedPart()->pointsSize() == 0)
+    if (faceShape->getActivedPart()->getPointsSize() == 0)
         return;
 
     QRectF box = faceShape->getActivedPart()->getBox();
@@ -374,7 +420,7 @@ void MarkupView::deleteLandmark(const QPointF &click)
 
 void MarkupView::clearScenePoints(const int &indPart)
 {
-    for (int indItem = 0; indItem < faceShape->parts[indPart].pointsSize(); indItem++)
+    for (int indItem = 0; indItem < faceShape->parts[indPart].getPointsSize(); indItem++)
         scene->removeItem(faceShape->parts[indPart].points[indItem]);
 }
 
@@ -462,7 +508,7 @@ Landmark *MarkupView::createLandmark(qreal x, qreal y, qreal w, qreal h, int ind
 
 void MarkupView::changeSizeLandmark(const double &size)
 {
-    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->pointsSize(); indPoint++)
+    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->getPointsSize(); indPoint++)
         faceShape->getActivedPart()->points[indPoint]->setSize(size);
     sizePointsValue = size;
 }
@@ -474,7 +520,7 @@ void MarkupView::updateSegmentPath()
     faceShape->getActivedPart()->update();
     clearScenePath(faceShape->indActived);
 
-    if (faceShape->getActivedPart()->pointsSize() < 4)
+    if (faceShape->getActivedPart()->getPointsSize() < 4)
         return;
 
     QVector<QPointF> pointsUp = faceShape->getActivedPart()->up;
@@ -486,6 +532,11 @@ void MarkupView::updateSegmentPath()
     pointsUp.push_front(pointsCorners.first());
     pointsUp.push_back(pointsCorners.last());
 
+    //    QVector<QVector2D> pointUpVec;
+    //    for (int ind = 0; ind < pointsUp.size(); ind++)
+    //        pointUpVec.push_back(QVector2D(pointsUp[ind]));
+    //SplineAdapter *splineUp = new CatMullRomSpline(pointsUp);
+    //QPainterPath pathUp = splineUp->getPath(0.01);
     //    const int size = pointsUp.size();
     //    Spline<QVector2D> splineUp;
     //    for (int indPoint = 0; indPoint < pointsUp.size(); indPoint++){
@@ -502,8 +553,17 @@ void MarkupView::updateSegmentPath()
     //        pathUp.lineTo(pt.toPointF());
     //    }
 
-    //QPainterPath pathUp ;//= Spline::build(QPolygonF(pointsUp));
+    CatMullRomSpline splineUp(pointsUp);
+    QPainterPath pathUp = splineUp.getPath(0.01);//= Spline::build(QPolygonF(pointsUp));
 
+    //Curves::Curve<QVector2D> spline(pointUpVec);
+    //Curves::CurveCatmullRomWrapper<QVector2D> spline(pointUpVec);
+
+    //    pathUp.moveTo(pointsUp.first().x(), pointsUp.first().y());
+    //    for (float x = spline.minParam(); x < spline.maxParam(); x = x + 0.01){
+    //        QVector2D vec = spline.paramToPoint(x);
+    //        pathUp.lineTo(vec.x(), vec.y());
+    //    }
     //    //
     //    tinyspline::BSpline bspline(pointsUp.size());
     //    std::vector<tinyspline::real> ctrlp = bspline.ctrlp();
@@ -524,9 +584,9 @@ void MarkupView::updateSegmentPath()
     //        pathUp.lineTo(x, result[result.size()-1]);
     //    }
     //
-    SplineAdapter splineUp;
-    splineUp.setPoints(pointsUp);
-    QPainterPath pathUp = splineUp.getPath();
+    //SplineAdapter splineUp;
+    //splineUp.setPoints(pointsUp);
+    //QPainterPath pathUp = splineUp.getPath();
 
     faceShape->getActivedPart()->pathUp = new QGraphicsPathItem(pathUp);
     QPen penUp(Qt::green);
@@ -536,16 +596,32 @@ void MarkupView::updateSegmentPath()
 
     pointsDown.push_front(pointsCorners.last());
     pointsDown.push_back(pointsCorners.first());
-    //QPainterPath pathDown; //= Spline::build(QPolygonF(pointsDown));
-    SplineAdapter splineDown;
-    splineDown.setPoints(pointsDown);
-    QPainterPath pathDown = splineDown.getPath();
+    //SplineAdapter *splineDown = new CatMullRomSpline(pointsDown);
+    // QPainterPath pathDown = splineDown->getPath(0.01);
+    CatMullRomSpline splineDown(pointsDown);
+    QPainterPath pathDown = splineDown.getPath(0.01); //= Spline::build(QPolygonF(pointsDown));
+    //    SplineAdapter splineDown;
+    //    splineDown.setPoints(pointsDown);
+    //    QPainterPath pathDown = splineDown.getPath();
 
     faceShape->getActivedPart()->pathDown = new QGraphicsPathItem(pathDown);
     QPen penDown(Qt::blue);
     penDown.setWidth(0.1);
     faceShape->getActivedPart()->pathDown->setPen(penDown);
     scene->addItem(faceShape->getActivedPart()->pathDown);
+
+    QVector<QPointF> up;
+    QVector<QPointF> down;
+    for (int ind = 0; ind < faceShape->getActivedPart()->down.size(); ind++)
+        down.push_back(faceShape->getActivedPart()->down[ind]);
+
+    for (int ind = 0; ind < faceShape->getActivedPart()->up.size(); ind++)
+        up.push_back(faceShape->getActivedPart()->up[ind]);
+
+    for (int ind = 0; ind < faceShape->getActivedPart()->corner.size(); ind++){
+        down.push_back(faceShape->getActivedPart()->corner[ind]);
+        up.push_back(faceShape->getActivedPart()->corner[ind]);
+    }
 
     if (invisibleSegmentInd.size() != 0){
         int size = invisibleSegmentInd.size();
@@ -556,13 +632,28 @@ void MarkupView::updateSegmentPath()
                 int indSecondPoint = invisibleSegmentInd[indSegment].at(indPoint+1);
                 QPointF firstPoint = faceShape->getActivedPart()->points[indFirstPoint]->scenePos();
                 QPointF secondPoint = faceShape->getActivedPart()->points[indSecondPoint]->scenePos();
-
                 QPainterPath path;
-                if (!faceShape->getActivedPart()->down.contains(firstPoint))
-                    path = splineUp.getPath(firstPoint.x(), secondPoint.x());
+                if (up.contains(firstPoint) && up.contains(secondPoint)){
+                    float paramStart = splineUp.getParam(firstPoint);
+                    float paramFinish = splineUp.getParam(secondPoint);
+                    if (paramStart > paramFinish){
+                        float t = paramFinish;
+                        paramFinish = paramStart;
+                        paramStart = t;
+                    }
+                    path = splineUp.getPath(paramStart, paramFinish, 0.01);
+                }
                 else
-                    path = splineDown.getPath(firstPoint.x(), secondPoint.x());
-
+                {
+                    float paramStart = splineDown.getParam(firstPoint);
+                    float paramFinish = splineDown.getParam(secondPoint);
+                    if (paramStart > paramFinish){
+                        float t = paramFinish;
+                        paramFinish = paramStart;
+                        paramStart = t;
+                    }
+                    path = splineDown.getPath(paramStart, paramFinish, 0.01);
+                }
                 paths.push_back(new QGraphicsPathItem(path));
                 QPen penUp;
                 penUp.setColor(Qt::white);
@@ -574,8 +665,37 @@ void MarkupView::updateSegmentPath()
             }
         }
     }
-
 }
+
+//    if (invisibleSegmentInd.size() != 0){
+//        int size = invisibleSegmentInd.size();
+
+//        for (int indSegment = 0; indSegment < size; indSegment++){
+//            for (int indPoint = 0; indPoint < invisibleSegmentInd[indSegment].size()-1; indPoint++){
+//                int indFirstPoint = invisibleSegmentInd[indSegment].at(indPoint);
+//                int indSecondPoint = invisibleSegmentInd[indSegment].at(indPoint+1);
+//                QPointF firstPoint = faceShape->getActivedPart()->points[indFirstPoint]->scenePos();
+//                QPointF secondPoint = faceShape->getActivedPart()->points[indSecondPoint]->scenePos();
+
+//                QPainterPath path;
+//                if (!faceShape->getActivedPart()->down.contains(firstPoint))
+//                    path = splineUp.getPath(splineUp.getParam(firstPoint), splineUp.getParam(secondPoint), 0.01);
+//                else
+//                    path = splineDown.getPath(splineUp.getParam(firstPoint), splineUp.getParam(secondPoint), 0.01);
+
+//                paths.push_back(new QGraphicsPathItem(path));
+//                QPen penUp;
+//                penUp.setColor(Qt::white);
+//                if (faceShape->getActivedPart()->indInvisibleSegment == indSegment)
+//                    penUp.setColor(Qt::yellow);
+//                penUp.setWidth(1);
+//                paths.last()->setPen(penUp);
+//                scene->addItem(paths.last());
+//            }
+//        }
+//    }
+
+
 
 
 
@@ -583,7 +703,7 @@ void MarkupView::updateSegmentPoints()
 {
     clearScenePoints(faceShape->indActived);
 
-    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->pointsSize(); indPoint++)
+    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->getPointsSize(); indPoint++)
         scene->addItem(faceShape->getActivedPart()->points[indPoint]);
 }
 

@@ -27,7 +27,7 @@ struct Segment
     QGraphicsPathItem *pathDown = nullptr;
     QList<Landmark*> points;
 
-    QList<QVector<int>> invisibleSegmentsInd;
+    QList<QVector<int>> invisibleSegments;
     int indInvisibleSegment = 0;
     //QVector<int> invisibleSegment;
     QVector<int> invisible;

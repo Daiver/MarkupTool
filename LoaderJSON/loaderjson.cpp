@@ -2,9 +2,11 @@
 
 void LoaderJSON::saveJson(const QJsonDocument &doc, const QString &fileName)
 {
+    qDebug() << "inside save JSon";
     QFile file(fileName);
     file.open(QFile::WriteOnly);
     file.write(doc.toJson());
+    qDebug() << "out save JSon";
 }
 
 

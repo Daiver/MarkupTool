@@ -6,6 +6,7 @@
 #include "QJsonArray"
 #include "QVector"
 #include "QPointF"
+#include "QDebug"
 #include "QFile"
 
 namespace LoaderJSON

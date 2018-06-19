@@ -107,7 +107,7 @@ void Segment::update()
 
 Landmark *Segment::getEnd()
 {
-    for (int indPoint = 0; indPoint < pointsSize(); indPoint++)
+    for (int indPoint = 0; indPoint < getPointsSize(); indPoint++)
         if (points[indPoint]->isEnd() == true)
             return points[indPoint];
 
@@ -118,7 +118,7 @@ Landmark *Segment::getEnd()
 
 Landmark *Segment::getStart()
 {
-    for (int indPoint = 0; indPoint < pointsSize(); indPoint++)
+    for (int indPoint = 0; indPoint < getPointsSize(); indPoint++)
         if (points[indPoint]->isStart() == true)
             return points[indPoint];
 
@@ -142,7 +142,7 @@ QRect Segment::getBox() const
 {
     float xMin = 100000000, yMin = 100000000, xMax = 0, yMax = 0;
 
-    for (int indPoint = 0; indPoint < pointsSize(); indPoint++){
+    for (int indPoint = 0; indPoint < getPointsSize(); indPoint++){
         float x = points[indPoint]->scenePos().x();
         float y = points[indPoint]->scenePos().y();
 
@@ -165,7 +165,7 @@ QRect Segment::getBox() const
 
 
 
-int Segment::pointsSize() const
+int Segment::getPointsSize() const
 {
     return points.size();
 }
@@ -223,7 +223,7 @@ Segment *ShapeFace::getActivedPart()
 bool ShapeFace::isEmpty() const
 {
     for (int indPart = 0; indPart < parts.size(); indPart++)
-        if (parts[indPart].pointsSize() != 0)
+        if (parts[indPart].getPointsSize() != 0)
             return false;
 
     return true;

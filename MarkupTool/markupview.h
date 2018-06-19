@@ -12,9 +12,10 @@
 #include "body.h"
 #include "QtMath"
 #include "qmath.h"
-
-#include "interpolation.h"
 #include "splineadapter.h"
+
+//#include "Curves/catmullrom.h"
+#include "Curves/curve_wrapper.h"
 
 class MarkupView : public QGraphicsView
 {

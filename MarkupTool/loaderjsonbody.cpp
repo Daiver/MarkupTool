@@ -49,6 +49,7 @@ ShapeFace LoaderJSON::getBody(const QJsonDocument &doc)
 
 QJsonDocument LoaderJSON::createJson(const ShapeFace *body)
 {
+    qDebug() << "inside create JSon";
     QJsonObject obj;
     QJsonArray leftEyeCenters = getArray(body->parts[0].centers);
     QJsonArray leftEyeCornerArray = getArray(body->parts[0].corner);
@@ -96,6 +97,7 @@ QJsonDocument LoaderJSON::createJson(const ShapeFace *body)
     obj.insert("MouthInvisible", mouthEyeInvisibleArray);
 
     QJsonDocument doc(obj);
+    qDebug() << "Out create JSon";
     return doc;
 }
 

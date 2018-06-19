@@ -2,6 +2,14 @@
 
 void Segment::addPoint(Landmark *point, int indInsert)
 {
+    for (int indSegment = 0; indSegment < invisibleSegments.size(); indSegment++){
+        for (int indPoint = 0; indPoint < invisibleSegments[indSegment].size(); indPoint++){
+            if (indInsert <= invisibleSegments[indSegment][indPoint]){
+               invisibleSegments[indSegment][indPoint] =  invisibleSegments[indSegment][indPoint] + 1;
+            }
+        }
+    }
+
     points.insert(indInsert, point);
 
     if (points.size() == 4){
@@ -19,7 +27,6 @@ void Segment::addPoint(Landmark *point, int indInsert)
             point->setUp(true);
         points[indPoint]->setIndex(indPoint);
     }
-
     update();
 }
 

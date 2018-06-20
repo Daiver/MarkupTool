@@ -27,7 +27,7 @@ public:
     float getParam(const QPointF &point) override;
 
 private:
-    Curves::Curve<QVector2D> spline;
+    Curves::BSplineCurve<QVector2D> spline;
     QVector<QPointF> points;
 };
 #endif // SPLINEADAPTER_H

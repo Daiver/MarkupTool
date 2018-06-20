@@ -6,7 +6,7 @@ CatMullRomSpline::CatMullRomSpline(const QVector<QPointF> &points)
     for (int indPoint = 0; indPoint < points.size(); indPoint++)
         pts.push_back(QVector2D(points[indPoint]));
 
-    spline = Curves::Curve<QVector2D>(pts);
+    spline = Curves::BSplineCurve<QVector2D>::interpolatePoints(2, pts);
     this->points = points;
 }
 

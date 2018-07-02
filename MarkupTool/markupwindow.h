@@ -58,6 +58,8 @@ private slots:
     void on_searchFile_textChanged(const QString &fileName);
     void on_searchedFiles_itemDoubleClicked(QListWidgetItem *item);
 
+    void on_comboBox_activated(int index);
+
 private:
     bool isSizeContainsInd(const int &ind, const int &size) const;
     void loadShape(QString path);

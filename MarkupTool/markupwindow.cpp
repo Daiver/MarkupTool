@@ -254,7 +254,7 @@ void MarkupWindow::on_actionSave_shapeas_triggered()
     timer.start();
     QString fileName = QFileDialog::getSaveFileName(this, "Save shape", "/home/radiatus/Dataset/", "*.json");
     saveShape(fileName+".json");
-     qDebug() << "on_actionSave_shapeas_triggered " + QString::number(timer.elapsed()/100);
+    qDebug() << "on_actionSave_shapeas_triggered " + QString::number(timer.elapsed()/100);
 }
 
 void MarkupWindow::on_actionLoad_shapes_as_triggered()
@@ -334,7 +334,7 @@ void MarkupWindow::on_scaleOnSegment_valueChanged(int value)
     QElapsedTimer timer;
     timer.start();
     ui->markupView->setScaleParam(value);
-     qDebug() << "on_scaleOnSegment_valueChanged " + QString::number(timer.elapsed()/100);
+    qDebug() << "on_scaleOnSegment_valueChanged " + QString::number(timer.elapsed()/100);
 }
 
 void MarkupWindow::on_contrast_valueChanged(int value)
@@ -450,4 +450,19 @@ void MarkupWindow::on_actionPast_invisible_segment_triggered()
     ui->markupView->getFaceShape()->getActivedPart()->pastInvisibleSegment();
     ui->markupView->updateSegmentPath();
     qDebug() << "on_actionPast_invisible_segment_triggered " + QString::number(timer.elapsed()/100);
+}
+
+void MarkupWindow::on_comboBox_activated(int index)
+{
+    if (index == 2){
+        ui->markupView->clearScene(ui->markupView->getFaceShape()->indActived);
+    }
+    if (index == 0){
+        ui->markupView->updateSegmentPath();
+        ui->markupView->updateSegmentPoints();
+    }
+    if (index == 1){
+        ui->markupView->clearScene(ui->markupView->getFaceShape()->indActived);
+        ui->markupView->updateSegmentPoints();
+    }
 }

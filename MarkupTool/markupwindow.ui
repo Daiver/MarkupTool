@@ -18,7 +18,73 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0" rowspan="13">
+    <item row="8" column="1">
+     <widget class="QSlider" name="bright">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLabel" name="contrastLabel">
+      <property name="text">
+       <string>Contrast</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QDoubleSpinBox" name="pointsSize">
+      <property name="singleStep">
+       <double>0.100000000000000</double>
+      </property>
+      <property name="value">
+       <double>0.500000000000000</double>
+      </property>
+     </widget>
+    </item>
+    <item row="12" column="1">
+     <widget class="QLineEdit" name="searchFile">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="11" column="1">
+     <widget class="QLabel" name="ready">
+      <property name="text">
+       <string>Ready: </string>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::RichText</enum>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="1">
+     <widget class="QCheckBox" name="scaleSave">
+      <property name="text">
+       <string>Save scale</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="14">
      <widget class="MarkupView" name="markupView">
       <property name="cursor" stdset="0">
        <cursorShape>ArrowCursor</cursorShape>
@@ -37,20 +103,19 @@
       </property>
      </widget>
     </item>
-    <item row="6" column="1">
-     <widget class="QLabel" name="brightLabel">
-      <property name="text">
-       <string>Bright</string>
+    <item row="13" column="1">
+     <widget class="QListWidget" name="searchedFiles">
+      <property name="maximumSize">
+       <size>
+        <width>120</width>
+        <height>16777215</height>
+       </size>
       </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QDoubleSpinBox" name="pointsSize">
-      <property name="singleStep">
-       <double>0.100000000000000</double>
+      <property name="textElideMode">
+       <enum>Qt::ElideLeft</enum>
       </property>
-      <property name="value">
-       <double>0.500000000000000</double>
+      <property name="currentRow">
+       <number>-1</number>
       </property>
      </widget>
     </item>
@@ -76,33 +141,30 @@
       </item>
      </widget>
     </item>
-    <item row="10" column="1">
-     <widget class="QLabel" name="ready">
-      <property name="text">
-       <string>Ready: </string>
-      </property>
-      <property name="textFormat">
-       <enum>Qt::RichText</enum>
-      </property>
-      <property name="scaledContents">
-       <bool>false</bool>
-      </property>
-      <property name="wordWrap">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="11" column="1">
-     <widget class="QLineEdit" name="searchFile">
+    <item row="6" column="1">
+     <widget class="QSlider" name="contrast">
       <property name="maximumSize">
        <size>
         <width>120</width>
         <height>16777215</height>
        </size>
       </property>
+      <property name="singleStep">
+       <number>10</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
      </widget>
     </item>
-    <item row="3" column="1">
+    <item row="7" column="1">
+     <widget class="QLabel" name="brightLabel">
+      <property name="text">
+       <string>Bright</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
      <widget class="QSlider" name="scaleOnSegment">
       <property name="maximumSize">
        <size>
@@ -121,33 +183,14 @@
       </property>
      </widget>
     </item>
-    <item row="8" column="1">
-     <widget class="QCheckBox" name="scaleSave">
+    <item row="3" column="1">
+     <widget class="QLabel" name="scaleLabel">
       <property name="text">
-       <string>Save scale</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
+       <string>Scale on segment</string>
       </property>
      </widget>
     </item>
-    <item row="5" column="1">
-     <widget class="QSlider" name="contrast">
-      <property name="maximumSize">
-       <size>
-        <width>120</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="singleStep">
-       <number>10</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="9" column="1">
+    <item row="10" column="1">
      <widget class="QCheckBox" name="allowEdit">
       <property name="text">
        <string>Allow edit</string>
@@ -157,47 +200,23 @@
       </property>
      </widget>
     </item>
-    <item row="12" column="1">
-     <widget class="QListWidget" name="searchedFiles">
-      <property name="maximumSize">
-       <size>
-        <width>120</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="textElideMode">
-       <enum>Qt::ElideLeft</enum>
-      </property>
-      <property name="currentRow">
-       <number>-1</number>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1">
-     <widget class="QLabel" name="contrastLabel">
-      <property name="text">
-       <string>Contrast</string>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="1">
-     <widget class="QLabel" name="scaleLabel">
-      <property name="text">
-       <string>Scale on segment</string>
-      </property>
-     </widget>
-    </item>
-    <item row="7" column="1">
-     <widget class="QSlider" name="bright">
-      <property name="maximumSize">
-       <size>
-        <width>120</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
+     <widget class="QComboBox" name="comboBox">
+      <item>
+       <property name="text">
+        <string>Lines+points</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Points</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Nothing</string>
+       </property>
+      </item>
      </widget>
     </item>
    </layout>
@@ -208,7 +227,7 @@
      <x>0</x>
      <y>0</y>
      <width>1279</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="autoFillBackground">

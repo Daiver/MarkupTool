@@ -154,8 +154,8 @@ void Landmark::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, 
     }
 
     if (upCentral || downCentral){
-        pen.setColor(Qt::red);
-        brush.setColor(Qt::red);
+        pen.setColor(Qt::yellow);
+        brush.setColor(Qt::yellow);
     }
 
     if (invisible){

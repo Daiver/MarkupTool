@@ -1,27 +1,27 @@
 #include "splineadapter.h"
 
-CatMullRomSpline::CatMullRomSpline(const QVector<QPointF> &points)
+BSpline::BSpline(const QVector<QPointF> &points)
 {
     QVector<QVector2D> pts;
     for (int indPoint = 0; indPoint < points.size(); indPoint++)
         pts.push_back(QVector2D(points[indPoint]));
 
-    spline = Curves::BSplineCurve<QVector2D>::interpolatePoints(2, pts);
+    spline = new Curves::CurveBSpline<QVector2D>(pts, 2);
     this->points = points;
 }
 
-QPointF CatMullRomSpline::getPoint(const float &x)
+QPointF BSpline::getPoint(const float &x)
 {
-    QVector2D vec = spline.paramToPoint(x);
+    QVector2D vec = spline->paramToPoint(x);
     return vec.toPointF();
 }
 
-QPainterPath CatMullRomSpline::getPath(const float &step)
+QPainterPath BSpline::getPath(const float &step)
 {
-    return getPath(spline.minParam(), spline.maxParam(), step);
+    return getPath(spline->minParam(), spline->maxParam(), step);
 }
 
-QPainterPath CatMullRomSpline::getPath(const float &xStart, const float &xEnd, const float &step)
+QPainterPath BSpline::getPath(const float &xStart, const float &xEnd, const float &step)
 {
     QPainterPath path;
     path.moveTo(getPoint(xStart));
@@ -34,9 +34,9 @@ QPainterPath CatMullRomSpline::getPath(const float &xStart, const float &xEnd, c
     return path;
 }
 
-float CatMullRomSpline::getParam(const QPointF &point)
+float BSpline::getParam(const QPointF &point)
 {
     QVector2D vec(point);
-    return spline.pointToParam(vec);
+    return spline->pointToParam(vec);
 }
 

@@ -5,6 +5,7 @@
 #include "QVector"
 #include "QPainterPath"
 #include "Curves/curve_wrapper.h"
+#include "Curves/curvebspline.h"
 #include "QVector2D"
 
 class SplineAdapter
@@ -16,10 +17,10 @@ public:
     virtual float getParam(const QPointF &point) = 0;
 };
 
-class CatMullRomSpline : public SplineAdapter
+class BSpline : public SplineAdapter
 {
 public:
-    CatMullRomSpline(const QVector<QPointF> &points);
+    BSpline(const QVector<QPointF> &points);
 
     QPointF getPoint(const float &x) override;
     QPainterPath getPath(const float &step) override;
@@ -27,7 +28,7 @@ public:
     float getParam(const QPointF &point) override;
 
 private:
-    Curves::BSplineCurve<QVector2D> spline;
+    Curves::CurveBSpline<QVector2D> *spline = nullptr;
     QVector<QPointF> points;
 };
 #endif // SPLINEADAPTER_H

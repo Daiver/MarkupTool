@@ -16,8 +16,10 @@ void MarkupView::drawImage(const QImage &image)
     scene->clear();
 
     QImage imageLoc = image;
-    bright(imageLoc);
-    contrast(imageLoc);
+    if (brightValue != 0)
+        bright(imageLoc);
+    if (contrastValue != 0)
+        contrast(imageLoc);
     QPixmap pixmap = QPixmap::fromImage(imageLoc);
     this->imageItem = new QGraphicsPixmapItem(pixmap);
     scene->addItem(this->imageItem);
@@ -58,25 +60,64 @@ void MarkupView::addLandmark(Landmark *point, bool updatePath)
         return;
     }
 
-    float lineMin = 100000000;
-    float indMin = 0;
+    QVector<QVector2D> up;
+    QVector<QVector2D> down;
+    down.push_back(QVector2D(faceShape->getActivedPart()->corner[1]));
+    up.push_back(QVector2D(faceShape->getActivedPart()->corner[0]));
+    for (int ind = 0; ind < faceShape->getActivedPart()->down.size(); ind++)
+        down.push_back(QVector2D(faceShape->getActivedPart()->down[ind]));
 
-    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->points.size(); indPoint++){
-        int prev = indPoint;
-        int next = indPoint+1;
-        if (next == faceShape->getActivedPart()->points.size())
-            next = 0;
+    for (int ind = 0; ind < faceShape->getActivedPart()->up.size(); ind++)
+        up.push_back(QVector2D(faceShape->getActivedPart()->up[ind]));
 
-        QPointF prevPoint = faceShape->getActivedPart()->points[prev]->scenePos();
-        QPointF nextPoint = faceShape->getActivedPart()->points[next]->scenePos();
+    down.push_back(QVector2D(faceShape->getActivedPart()->corner[0]));
+    up.push_back(QVector2D(faceShape->getActivedPart()->corner[1]));
 
-        float line = getDistance(point->scenePos(), prevPoint, nextPoint);
-        if (line < lineMin){
-            lineMin = line;
-            indMin = prev+1;
+    Curves::CurveBSpline<QVector2D> *splineUp = new Curves::CurveBSpline<QVector2D>(up, 2);
+    Curves::CurveBSpline<QVector2D> *splineDown = new Curves::CurveBSpline<QVector2D>(down, 2);
+    float paramUp = splineUp->pointToParam(QVector2D(point->scenePos()));
+    float paramDown = splineDown->pointToParam(QVector2D(point->scenePos()));
+    QVector2D upPoint = splineUp->paramToPoint(paramUp);
+    QVector2D downPoint = splineDown->paramToPoint(paramDown);
+    float lenUp = (upPoint-QVector2D(point->scenePos())).length();
+    float lenDown = (downPoint-QVector2D(point->scenePos())).length();
+
+    int indPoints = 0;
+    if (lenUp < lenDown){
+        for (int indPoint = 0; indPoint < splineUp->editpoints().size(); indPoint++){
+            float paramLoc = splineUp->pointToParam(splineUp->editpoints()[indPoint]);
+            if (paramLoc < paramUp)
+                indPoints = indPoint+1;
         }
     }
-    faceShape->getActivedPart()->addPoint(point, indMin);
+    else
+    {
+        for (int indPoint = 0; indPoint < splineDown->editpoints().size(); indPoint++){
+            float paramLoc = splineDown->pointToParam(splineDown->editpoints()[indPoint]);
+            if (paramLoc < paramDown)
+                indPoints = indPoint + up.size();
+        }
+    }
+
+//    float lineMin = 100000000;
+//    float indMin = 0;
+
+//    for (int indPoint = 0; indPoint < faceShape->getActivedPart()->points.size(); indPoint++){
+//        int prev = indPoint;
+//        int next = indPoint+1;
+//        if (next == faceShape->getActivedPart()->points.size())
+//            next = 0;
+
+//        QPointF prevPoint = faceShape->getActivedPart()->points[prev]->scenePos();
+//        QPointF nextPoint = faceShape->getActivedPart()->points[next]->scenePos();
+
+//        float line = getDistance(point->scenePos(), prevPoint, nextPoint);
+//        if (line < lineMin){
+//            lineMin = line;
+//            indMin = prev+1;
+//        }
+//    }
+    faceShape->getActivedPart()->addPoint(point, indPoints);
     if (updatePath)
         updateSegmentPath();
     scene->addItem(point);
@@ -200,8 +241,10 @@ void MarkupView::updateImage(const QImage &image)
 {
     scene->removeItem(this->imageItem);
     QImage imageLoc = image;
-    bright(imageLoc);
-    contrast(imageLoc);
+    if (brightValue != 0)
+        bright(imageLoc);
+    if (contrastValue != 0)
+        contrast(imageLoc);
     QPixmap pixmap = QPixmap::fromImage(imageLoc);
     this->imageItem = new QGraphicsPixmapItem(pixmap);
     this->imageItem->setZValue(-100);
@@ -553,7 +596,7 @@ void MarkupView::updateSegmentPath()
     //        pathUp.lineTo(pt.toPointF());
     //    }
 
-    CatMullRomSpline splineUp(pointsUp);
+    BSpline splineUp(pointsUp);
     QPainterPath pathUp = splineUp.getPath(0.01);//= Spline::build(QPolygonF(pointsUp));
 
     //Curves::Curve<QVector2D> spline(pointUpVec);
@@ -598,7 +641,7 @@ void MarkupView::updateSegmentPath()
     pointsDown.push_back(pointsCorners.first());
     //SplineAdapter *splineDown = new CatMullRomSpline(pointsDown);
     // QPainterPath pathDown = splineDown->getPath(0.01);
-    CatMullRomSpline splineDown(pointsDown);
+    BSpline splineDown(pointsDown);
     QPainterPath pathDown = splineDown.getPath(0.01); //= Spline::build(QPolygonF(pointsDown));
     //    SplineAdapter splineDown;
     //    splineDown.setPoints(pointsDown);
